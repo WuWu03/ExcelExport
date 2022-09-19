@@ -1,0 +1,93 @@
+d:\documents\visual studio 2013\Projects\ReadExcel\ReadExcel\bin\Debug\ReadExcel.exe.config
+d:\documents\visual studio 2013\Projects\ReadExcel\ReadExcel\bin\Debug\ReadExcel.exe
+d:\documents\visual studio 2013\Projects\ReadExcel\ReadExcel\bin\Debug\ReadExcel.pdb
+d:\documents\visual studio 2013\Projects\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csprojResolveAssemblyReference.cache
+d:\documents\visual studio 2013\Projects\ReadExcel\ReadExcel\obj\Debug\ReadExcel.ExcelToByte.resources
+d:\documents\visual studio 2013\Projects\ReadExcel\ReadExcel\obj\Debug\ReadExcel.Properties.Resources.resources
+d:\documents\visual studio 2013\Projects\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.GenerateResource.Cache
+d:\documents\visual studio 2013\Projects\ReadExcel\ReadExcel\obj\Debug\ReadExcel.exe
+d:\documents\visual studio 2013\Projects\ReadExcel\ReadExcel\obj\Debug\ReadExcel.pdb
+d:\documents\visual studio 2013\Projects\ReadExcel\ReadExcel\obj\Debug\Interop.XDocsDesigner.dll
+d:\documents\visual studio 2013\Projects\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.ResolveComReference.cache
+D:\Documents\Visual Studio 2013\Projects\ReadExcel\ReadExcel\bin\Debug\ZipForge.dll
+D:\Documents\Visual Studio 2013\Projects\ReadExcel\ReadExcel\bin\Debug\ZipForge.xml
+F:\YouYouTools\ReadExcel\ReadExcel\bin\Debug\ReadExcel.exe.config
+F:\YouYouTools\ReadExcel\ReadExcel\obj\Debug\Interop.XDocsDesigner.dll
+F:\YouYouTools\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.ResolveComReference.cache
+F:\YouYouTools\ReadExcel\ReadExcel\obj\Debug\ReadExcel.exe
+F:\YouYouTools\ReadExcel\ReadExcel\obj\Debug\ReadExcel.pdb
+F:\YouYouTools\ReadExcel\ReadExcel\bin\Debug\ReadExcel.exe
+F:\YouYouTools\ReadExcel\ReadExcel\bin\Debug\ReadExcel.pdb
+F:\YouYouTools\ReadExcel\ReadExcel\obj\Debug\ReadExcel.ExcelToByte.resources
+F:\YouYouTools\ReadExcel\ReadExcel\obj\Debug\ReadExcel.Properties.Resources.resources
+F:\YouYouTools\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.GenerateResource.Cache
+D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\bin\Debug\ReadExcel.exe.config
+D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\bin\Debug\ReadExcel.exe
+D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\bin\Debug\ReadExcel.pdb
+D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csprojAssemblyReference.cache
+D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.ResolveComReference.cache
+D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\obj\Debug\ReadExcel.ExcelToByte.resources
+D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\obj\Debug\ReadExcel.Properties.Resources.resources
+D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.GenerateResource.cache
+D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.CopyComplete
+D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\obj\Debug\ReadExcel.exe
+D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\obj\Debug\ReadExcel.pdb
+D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\bin\Debug\ICSharpCode.SharpZipLib.dll
+D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\bin\Debug\NPOI.dll
+D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\bin\Debug\NPOI.OOXML.dll
+D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\bin\Debug\NPOI.OpenXml4Net.dll
+D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\bin\Debug\NPOI.OpenXmlFormats.dll
+D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\bin\Debug\ICSharpCode.SharpZipLib.xml
+E:\code\ToolClass\ReadExcel\ReadExcel\bin\Debug\ReadExcel.exe.config
+E:\code\ToolClass\ReadExcel\ReadExcel\bin\Debug\ReadExcel.exe
+E:\code\ToolClass\ReadExcel\ReadExcel\bin\Debug\ReadExcel.pdb
+E:\code\ToolClass\ReadExcel\ReadExcel\bin\Debug\ICSharpCode.SharpZipLib.dll
+E:\code\ToolClass\ReadExcel\ReadExcel\bin\Debug\NPOI.dll
+E:\code\ToolClass\ReadExcel\ReadExcel\bin\Debug\NPOI.OOXML.dll
+E:\code\ToolClass\ReadExcel\ReadExcel\bin\Debug\NPOI.OpenXml4Net.dll
+E:\code\ToolClass\ReadExcel\ReadExcel\bin\Debug\NPOI.OpenXmlFormats.dll
+E:\code\ToolClass\ReadExcel\ReadExcel\bin\Debug\ICSharpCode.SharpZipLib.xml
+E:\code\ToolClass\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csprojAssemblyReference.cache
+E:\code\ToolClass\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.ResolveComReference.cache
+E:\code\ToolClass\ReadExcel\ReadExcel\obj\Debug\ReadExcel.ExcelToByte.resources
+E:\code\ToolClass\ReadExcel\ReadExcel\obj\Debug\ReadExcel.Properties.Resources.resources
+E:\code\ToolClass\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.GenerateResource.cache
+E:\code\ToolClass\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.CopyComplete
+E:\code\ToolClass\ReadExcel\ReadExcel\obj\Debug\ReadExcel.exe
+E:\code\ToolClass\ReadExcel\ReadExcel\obj\Debug\ReadExcel.pdb
+G:\Code\ToolClass\ReadExcel\ReadExcel\bin\Debug\ReadExcel.exe.config
+G:\Code\ToolClass\ReadExcel\ReadExcel\bin\Debug\ReadExcel.exe
+G:\Code\ToolClass\ReadExcel\ReadExcel\bin\Debug\ReadExcel.pdb
+G:\Code\ToolClass\ReadExcel\ReadExcel\bin\Debug\ICSharpCode.SharpZipLib.dll
+G:\Code\ToolClass\ReadExcel\ReadExcel\bin\Debug\NPOI.dll
+G:\Code\ToolClass\ReadExcel\ReadExcel\bin\Debug\NPOI.OOXML.dll
+G:\Code\ToolClass\ReadExcel\ReadExcel\bin\Debug\NPOI.OpenXml4Net.dll
+G:\Code\ToolClass\ReadExcel\ReadExcel\bin\Debug\NPOI.OpenXmlFormats.dll
+G:\Code\ToolClass\ReadExcel\ReadExcel\bin\Debug\ICSharpCode.SharpZipLib.xml
+G:\Code\ToolClass\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.AssemblyReference.cache
+G:\Code\ToolClass\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.SuggestedBindingRedirects.cache
+G:\Code\ToolClass\ReadExcel\ReadExcel\obj\Debug\ReadExcel.ExcelExport.resources
+G:\Code\ToolClass\ReadExcel\ReadExcel\obj\Debug\ReadExcel.Properties.Resources.resources
+G:\Code\ToolClass\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.GenerateResource.cache
+G:\Code\ToolClass\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.CoreCompileInputs.cache
+G:\Code\ToolClass\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.CopyComplete
+G:\Code\ToolClass\ReadExcel\ReadExcel\obj\Debug\ReadExcel.exe
+G:\Code\ToolClass\ReadExcel\ReadExcel\obj\Debug\ReadExcel.pdb
+G:\Work\ReadExcel\ReadExcel\bin\Debug\ReadExcel.exe.config
+G:\Work\ReadExcel\ReadExcel\bin\Debug\ReadExcel.exe
+G:\Work\ReadExcel\ReadExcel\bin\Debug\ReadExcel.pdb
+G:\Work\ReadExcel\ReadExcel\bin\Debug\ICSharpCode.SharpZipLib.dll
+G:\Work\ReadExcel\ReadExcel\bin\Debug\NPOI.dll
+G:\Work\ReadExcel\ReadExcel\bin\Debug\NPOI.OOXML.dll
+G:\Work\ReadExcel\ReadExcel\bin\Debug\NPOI.OpenXml4Net.dll
+G:\Work\ReadExcel\ReadExcel\bin\Debug\NPOI.OpenXmlFormats.dll
+G:\Work\ReadExcel\ReadExcel\bin\Debug\ICSharpCode.SharpZipLib.xml
+G:\Work\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.AssemblyReference.cache
+G:\Work\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.SuggestedBindingRedirects.cache
+G:\Work\ReadExcel\ReadExcel\obj\Debug\ReadExcel.ExcelExport.resources
+G:\Work\ReadExcel\ReadExcel\obj\Debug\ReadExcel.Properties.Resources.resources
+G:\Work\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.GenerateResource.cache
+G:\Work\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.CoreCompileInputs.cache
+G:\Work\ReadExcel\ReadExcel\obj\Debug\ReadExcel.csproj.CopyComplete
+G:\Work\ReadExcel\ReadExcel\obj\Debug\ReadExcel.exe
+G:\Work\ReadExcel\ReadExcel\obj\Debug\ReadExcel.pdb
