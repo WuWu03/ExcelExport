@@ -1,4 +1,0 @@
-D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\obj\x86\Debug\ReadExcel.csproj.ResolveComReference.cache
-D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\obj\x86\Debug\ReadExcel.ExcelToByte.resources
-D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\obj\x86\Debug\ReadExcel.Properties.Resources.resources
-D:\BaiduYunDownload\悠游课堂UnityMMORPG中高级课程\悠游课堂学习资料_中高级\ReadExcel\ReadExcel\obj\x86\Debug\ReadExcel.csproj.GenerateResource.cache
