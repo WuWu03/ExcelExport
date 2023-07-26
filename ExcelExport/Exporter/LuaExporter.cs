@@ -1,4 +1,5 @@
-﻿using NPOI.SS.Formula.Eval;
+﻿using LitJson;
+using NPOI.SS.Formula.Eval;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -42,6 +43,7 @@ namespace ExcelExport.Exporter
                     string fieldName = dt.Rows[0][j].ToString().Trim();
                     string fieldType = dt.Rows[1][j].ToString().Trim();
                     string fieldValue = dt.Rows[i][j].ToString().Trim();
+
                     string fieldStr = GetFieldStr(fieldName, fieldValue, fieldType);
 
                     if (!string.IsNullOrEmpty(fieldStr))
@@ -66,7 +68,7 @@ namespace ExcelExport.Exporter
         /// </summary>
         protected override void CreateDataHelperScript()
         {
-            
+
         }
 
         private string GetFieldStr(string fieldName, string fieldValue, string fieldType)
@@ -77,33 +79,71 @@ namespace ExcelExport.Exporter
             }
             else if (fieldType.Equals("json"))
             {
-                if (string.IsNullOrEmpty(fieldValue))
+                if (!string.IsNullOrEmpty(fieldValue))
                 {
-                    return string.Empty;
+                    JsonData jsonData = LitJson.JsonMapper.ToObject(fieldValue);
+
+                    if (jsonData != null)
+                    {
+                        StringBuilder jsonSB = new StringBuilder();
+                        ParseJson(jsonData, jsonSB);
+                        return string.Format("{0} = {1}\n{2}\t\t{3},", fieldName, "{", jsonSB.ToString(), "}");
+                    }
                 }
 
-                object jsonObj = LitJson.JsonMapper.ToObject(fieldValue);
+                return string.Format("{0} = nil,", fieldName);
+            }
 
-                if (jsonObj == null)
+            if (string.IsNullOrEmpty(fieldValue))
+            {
+                fieldValue = fieldType.Contains("bool") ? "false" : "nil";
+            }
+            else if (fieldType.Contains("[]"))
+            {
+                string result = fieldName + " = {\n\t\t\t";
+                string fieldValueTemp = fieldValue.Replace(" ", "").Replace(",", ",\n\t\t\t");
+
+                if (fieldType.Contains("string"))
                 {
-                    return string.Empty;
+                    fieldValueTemp = "\"" + fieldValue.Replace(" ", "").Replace(",", "\",\n\t\t\t\"") + "\"";
+                }
+                else if(fieldType.Contains("bool"))
+                {
+                    fieldValueTemp = fieldValueTemp.ToLower();
                 }
 
-                StringBuilder jsonSB = new StringBuilder();
-                ParseJson(jsonObj, jsonSB);
-                return string.Format("{0} = {1}\n{2}\n\t\t{3},", fieldName, "{", jsonSB.ToString(), "}");
+                return result + fieldValueTemp + ",\n\t\t},";
+            }
+            else if (fieldType.Contains("Vector"))
+            {
+                string[] vectorValues = fieldValue.Split(',');
+                string[] vectorFieldName = { "x", "y", "z" };
+                string result = fieldName + " = {";
+
+                for (int i = 0; i < vectorValues.Length; i++)
+                {
+                    result += string.Format("{0} = {1}", vectorFieldName[i], vectorValues[i]);
+
+                    if(i < vectorValues.Length - 1)
+                    {
+                        result += ",";
+                    }
+                }
+                
+
+                return result + "},";
             }
 
             return string.Format("{0} = {1},", fieldName, fieldValue);
         }
 
-        private void ParseJson(object json, StringBuilder sb, int tCount = 3)
+        private void ParseJson(JsonData jsonData, StringBuilder sb, int tCount = 3)
         {
-            if (json is List<object> jsonList)
+            if (jsonData.IsArray)
             {
-                for (int i = 0; i < jsonList.Count; i++)
+                for (int i = 0; i < jsonData.Count; i++)
                 {
-                    if (!JsonFieldIsBaseValueType(string.Format("[{0}]", i + 1), jsonList[i], tCount, sb))
+                    if (!JsonFieldIsBaseValueType(string.Format("[{0}]", i + 1), jsonData[i], tCount, sb))
                     {
                         for (int j = 0; j < tCount; j++)
                         {
@@ -113,7 +153,7 @@ namespace ExcelExport.Exporter
                         sb.AppendFormat("[{0}] = ", i + 1);
                         sb.Append("{\n");
 
-                        ParseJson(jsonList[i], sb, tCount + 1);
+                        ParseJson(jsonData[i], sb, tCount + 1);
 
                         for (int j = 0; j < tCount; j++)
                         {
@@ -124,14 +164,14 @@ namespace ExcelExport.Exporter
                     }
                 }
             }
-            else if (json is Dictionary<string, object> jsonDic)
+            else if (jsonData.Keys.Count > 0)
             {
-                foreach (KeyValuePair<string, object> kvp in jsonDic)
+                foreach (KeyValuePair<string, LitJson.JsonData> kvp in jsonData)
                 {
                     string key = kvp.Key;
-                    object val = kvp.Value;
+                    JsonData val = kvp.Value;
 
-                    if (!JsonFieldIsBaseValueType(key, val, tCount,sb))
+                    if (!JsonFieldIsBaseValueType(key, val, tCount, sb))
                     {
                         for (int i = 0; i < tCount; i++)
                         {
@@ -154,33 +194,29 @@ namespace ExcelExport.Exporter
             }
         }
 
-        private bool JsonFieldIsBaseValueType(string fieldName,object fieldValue,int tCount, StringBuilder sb)
+        private bool JsonFieldIsBaseValueType(string fieldName, JsonData jsonData, int tCount, StringBuilder sb)
         {
-            string fieldValueStr = fieldValue.ToString();
+            string fieldValueStr = jsonData.ToString();
             string fieldType = string.Empty;
 
-            if (fieldValue is int)
+            if (jsonData.IsInt)
             {
                 fieldType = "int";
             }
-            else if (fieldValue is long)
+            else if (jsonData.IsLong)
             {
                 fieldType = "long";
             }
-            else if (fieldValue is float)
-            {
-                fieldType = "float";
-            }
-            else if (fieldValue is double)
+            else if (jsonData.IsDouble)
             {
                 fieldType = "double";
             }
-            else if (fieldValue is bool)
+            else if (jsonData.IsBoolean)
             {
                 fieldType = "bool";
                 fieldValueStr = fieldValueStr.ToLower();
             }
-            else if (fieldValue is string)
+            else if (jsonData.IsString)
             {
                 fieldType = "string";
             }
@@ -198,6 +234,5 @@ namespace ExcelExport.Exporter
             sb.AppendFormat("{0}\n", GetFieldStr(fieldName, fieldValueStr, fieldType));
             return true;
         }
-
     }
 }

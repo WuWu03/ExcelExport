@@ -313,7 +313,7 @@ namespace ExcelExport
             this.btnDelectPathConfig.TabIndex = 3;
             this.btnDelectPathConfig.Text = "删除配置";
             this.btnDelectPathConfig.UseVisualStyleBackColor = true;
-            this.btnDelectPathConfig.Click += new System.EventHandler(this.OnBtnDelectPathConfigClick);
+            this.btnDelectPathConfig.Click += new System.EventHandler(this.OnBtnDeletePathConfigClick);
             // 
             // ExcelExport
             // 

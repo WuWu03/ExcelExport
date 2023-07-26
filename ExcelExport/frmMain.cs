@@ -1,12 +1,19 @@
-﻿using ExcelExport.Helper;
+﻿using ExcelExport;
+using ExcelExport.Helper;
+using LitJson;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 
 namespace ExcelExport
 {
     public partial class ExcelExport : Form
     {
+        /// <summary>
+        /// 初始化
+        /// </summary>
         public ExcelExport()
         {
             InitializeComponent();
@@ -88,6 +95,11 @@ namespace ExcelExport
             }
         }
 
+        /// <summary>
+        /// excel文件路径选择按钮点击
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnBtnSelectExcelClick(object sender, EventArgs e)
         {
             using (FolderBrowserDialog fbDlg = new FolderBrowserDialog())
@@ -99,6 +111,11 @@ namespace ExcelExport
             }
         }
 
+        /// <summary>
+        /// 导出路径选择按钮点击
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnBtnSelectExportClick(object sender, EventArgs e)
         {
             using (FolderBrowserDialog fbDlg = new FolderBrowserDialog())
@@ -110,6 +127,11 @@ namespace ExcelExport
             }
         }
 
+        /// <summary>
+        /// 修改配置按钮点击
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnBtnModifyPathConfigClick(object sender, EventArgs e)
         {
             ConfigHelper.ModifyPahtConfig(textBoxPathName.Text, textBoxExcel.Text, textBoxExport.Text);
@@ -117,6 +139,11 @@ namespace ExcelExport
             MessageBox.Show(this, "修改成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        /// <summary>
+        /// 添加配置按钮点击
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnBtnAddPathConfigClick(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(textBoxPathName.Text))
@@ -137,7 +164,12 @@ namespace ExcelExport
             MessageBox.Show(this, "添加成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void OnBtnDelectPathConfigClick(object sender, EventArgs e)
+        /// <summary>
+        /// 删除配置按钮点击
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnBtnDeletePathConfigClick(object sender, EventArgs e)
         {
             if(MessageBox.Show("确认删除本条配置？","警告",MessageBoxButtons.YesNo,MessageBoxIcon.Question) == DialogResult.Yes)
             {
@@ -158,6 +190,10 @@ namespace ExcelExport
             }
         }
 
+        /// <summary>
+        /// 读取excel
+        /// </summary>
+        /// <param name="path"></param>
         private void LoadExcelFiles(string path)
         {
             ExportHelper.ResetExcel();
@@ -180,22 +216,43 @@ namespace ExcelExport
             MessageBox.Show(this, "读取成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        /// <summary>
+        /// 导出excel
+        /// </summary>
+        /// <param name="path"></param>
         private void ExportExcel(string path)
         {
             ExportHelper.Export(path);
             MessageBox.Show(this, "创建成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            System.Diagnostics.Process.Start("explorer.exe", path + @"\");
         }
 
+        /// <summary>
+        /// 导出语言选择
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnCodeTypeComboBoxSelectedIndexChanged(object sender, EventArgs e)
         {
             ExportHelper.SetCurrExporter(codeTypeComboBox.SelectedIndex);
         }
 
+        /// <summary>
+        /// 文件列表
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnExcelListItemCheck(object sender, ItemCheckEventArgs e)
         {
             ExportHelper.SetExcelCanExport(e.Index, !excelList.GetItemChecked(e.Index));
         }
 
+        /// <summary>
+        /// 文本框文件路径拖拽
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnTextBoxExcelDragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -208,12 +265,23 @@ namespace ExcelExport
             }
         }
 
+        /// <summary>
+        /// 文本框文件路径拖拽
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnTextBoxExcelDragDrop(object sender, DragEventArgs e)
         {
             string excelPath = ((System.Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
             textBoxExcel.Text = excelPath;
         }
 
+
+        /// <summary>
+        /// 文本框文件路径拖拽
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnTextBoxExportDragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -226,6 +294,12 @@ namespace ExcelExport
             }
         }
 
+
+        /// <summary>
+        /// 文本框文件路径拖拽
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnTextBoxExportDragDrop(object sender, DragEventArgs e)
         {
             string exportPath = ((System.Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString(); 
@@ -233,6 +307,11 @@ namespace ExcelExport
             textBoxExport.Text = exportPath;
         }
 
+        /// <summary>
+        /// 路径配置列表选择
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnConfigListComboBoxChanged(object sender, EventArgs e)
         {
             bool showAddPathBtn = ConfigHelper.ConfigData.Count < 1 || this.configListComboBox.SelectedIndex == ConfigHelper.ConfigData.Count;
@@ -263,3 +342,4 @@ namespace ExcelExport
         //private List<string> _allTalbeName = new List<string>();
     }
 }
+

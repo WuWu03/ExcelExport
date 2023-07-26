@@ -45,9 +45,9 @@ namespace ExcelExport.Exporter
                 mse.WriteInt(dt.Rows.Count - 3);
                 mse.WriteInt(dt.Columns.Count - 1);
 
-                for (int j = 1; j < dt.Columns.Count; j++)
+                for (int i = 1; i < dt.Columns.Count; i++)
                 {
-                    mse.WriteUTF8String(dt.Rows[0][j].ToString().Trim());
+                    mse.WriteUTF8String(dt.Rows[0][i].ToString().Trim());
                 }
 
                 for (int i = 4; i < dt.Rows.Count; i++)
@@ -65,10 +65,19 @@ namespace ExcelExport.Exporter
             buffer = ZlibHelper.CompressBytes(buffer);
 
             //写入文件
-            FileStream fs = new FileStream(string.Format("{0}/C#/Data/{1}Data.bytes", m_ExportPath, dataTableName), FileMode.Create);
+            FileStream fs = new FileStream(string.Format("{0}/C#/Data/{1}ConfigData.bytes", m_ExportPath, dataTableName), FileMode.Create);
             fs.Write(buffer, 0, buffer.Length);
             fs.Close();
 
+            CreateDataScript(dt, excelName, sheetName);
+        }
+
+        /// <summary>
+        /// 生成C#代码
+        /// </summary>
+        private void CreateDataScript(DataTable dt, string excelName, string sheetName)
+        {
+            string dataTableName = dt.Rows[1][0].ToString();
             string[,] dataArr = new string[dt.Columns.Count - 1, 3];
 
             for (int i = 0; i < 3; i++)
@@ -79,28 +88,15 @@ namespace ExcelExport.Exporter
                 }
             }
 
-            CreateDataScript(dataArr, dt, excelName, sheetName, dataTableName);
-        }
-
-        /// <summary>
-        /// 生成C#代码
-        /// </summary>
-        private void CreateDataScript(string[,] dataArr, DataTable dt, string excelName, string sheetName, string dataTableName)
-        {
-            if (dataArr == null)
-            {
-                return;
-            }
-
             StringBuilder sb = new StringBuilder();
             sb.Append("\r\n");
             sb.Append("//===================================================\r\n");
-            sb.Append("//作者：GQY                                          \r\n");
+            sb.Append("//作者：WuWu                                          \r\n");
             sb.AppendFormat("//创建时间：{0}\r\n", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             sb.Append("//备注：此代码为工具生成 请勿手工修改\r\n");
             sb.Append("//===================================================\r\n");
             sb.Append("using GameFrameWork;\r\n");
-            sb.Append("using GameFrameWork.LocalData;\r\n");
+            sb.Append("using GameFrameWork.ConfigData;\r\n");
             sb.Append("using LitJson;\r\n");
             sb.Append("using System;\r\n");
             sb.Append("using System.Collections;\r\n");
@@ -110,7 +106,7 @@ namespace ExcelExport.Exporter
             sb.AppendFormat("/// {0}数据表\r\n", excelName);
             sb.AppendFormat("/// SheetName:{0}\r\n", sheetName);
             sb.Append("/// </summary>\r\n");
-            sb.AppendFormat("public class {0}Data : BaseLocalData\r\n", dataTableName);
+            sb.AppendFormat("public class {0}ConfigData : BaseConfigData\r\n", dataTableName);
             sb.Append("{\r\n");
 
             //生成Json实体类代码
@@ -118,7 +114,7 @@ namespace ExcelExport.Exporter
 
             for (int i = 1; i < dataArr.GetLength(0); i++)
             {
-                string typeName = dataArr[i, 1];
+                string typeName = GetTypeName(dataArr[i, 1]);
 
                 if (typeName.Equals("json"))
                 {
@@ -149,7 +145,7 @@ namespace ExcelExport.Exporter
             //生成字段代码
             for (int i = 1; i < dataArr.GetLength(0); i++)
             {
-                string typeName = dataArr[i, 1];
+                string typeName = GetTypeName(dataArr[i, 1]);
 
                 if (typeName.Equals("json"))
                 {
@@ -164,28 +160,36 @@ namespace ExcelExport.Exporter
             }
 
             //生成克隆代码
-            sb.AppendFormat("\tpublic {0}Data Clone()\r\n", dataTableName);
+
+            string variableName = dataTableName.Substring(0, 1).ToLower() + dataTableName.Substring(1);
+
+            sb.AppendFormat("\tpublic {0}ConfigData Clone()\r\n", dataTableName);
             sb.Append("\t{\r\n");
-            sb.AppendFormat("\t\t{0}Data {1}Data = new {2}Data();\r\n", dataTableName, dataTableName.ToLower(), dataTableName);
+            sb.AppendFormat("\t\t{0}ConfigData {1}ConfigData = new {2}ConfigData();\r\n", dataTableName, variableName, dataTableName);
 
             for (int i = 1; i < dataArr.GetLength(0); i++)
             {
-                sb.AppendFormat("\t\t{0}Data.{1} = this.{2};", dataTableName.ToLower(), dataArr[i, 0], dataArr[i, 0]);
+                sb.AppendFormat("\t\t{0}ConfigData.{1} = this.{2};", variableName, dataArr[i, 0], dataArr[i, 0]);
                 sb.Append("\r\n");
             }
 
-            sb.AppendFormat("\t\treturn {0}Data;\r\n", dataTableName.ToLower());
+            sb.AppendFormat("\t\treturn {0}ConfigData;\r\n", variableName);
             sb.Append("\t}\r\n");
             sb.Append("\r\n");
 
             //生成解析代码
-            sb.AppendFormat("\tpublic override void Read(LocalDataParser parser)\r\n");
+            sb.AppendFormat("\tpublic override void Read(ConfigDataParser parser)\r\n");
             sb.Append("\t{\r\n");
 
             for (int i = 0; i < dataArr.GetLength(0); i++)
             {
+                if (string.IsNullOrEmpty(dataArr[i, 0]))
+                {
+                    continue;
+                }
+
                 string fieldName = dataArr[i, 0].Substring(0, 1).ToLower() + dataArr[i, 0].Substring(1);
-                string typeName = dataArr[i, 1];
+                string typeName = GetTypeName(dataArr[i, 1]);
 
                 if (typeName.Equals("json"))
                 {
@@ -194,7 +198,7 @@ namespace ExcelExport.Exporter
                 }
                 else
                 {
-                    sb.AppendFormat("\t\tthis.{0} = parser.GetFieldValue(\"{0}\"){1};\r\n", fieldName, ChangeTypeName(typeName));
+                    sb.AppendFormat("\t\tthis.{0} = parser.GetFieldValue(\"{0}\"){1};\r\n", fieldName, GetTypeParseStr(typeName));
                 }
             }
 
@@ -202,7 +206,7 @@ namespace ExcelExport.Exporter
             sb.Append("}\r\n");
 
             //写入文件
-            using (FileStream fs = new FileStream(string.Format("{0}/C#/Script/{1}Data.cs", m_ExportPath, dataTableName), FileMode.Create))
+            using (FileStream fs = new FileStream(string.Format("{0}/C#/Script/{1}ConfigData.cs", m_ExportPath, dataTableName), FileMode.Create))
             {
                 using (StreamWriter sw = new StreamWriter(fs))
                 {
@@ -224,19 +228,20 @@ namespace ExcelExport.Exporter
             sb.Append("//备注：此代码为工具生成 请勿手工修改\r\n");
             sb.Append("//===================================================\r\n");
             sb.Append("using System.Collections;\r\n");
-            sb.Append("using GameFrameWork.LocalData;\r\n");
+            sb.Append("using GameFrameWork.ConfigData;\r\n");
             sb.Append("\r\n");
             sb.Append("/// <summary>\r\n");
             sb.AppendFormat("///数据总表\r\n");
             sb.Append("/// </summary>\r\n");
-            sb.AppendFormat("public static class DataHelper\r\n");
+            sb.AppendFormat("public static partial class ConfigDataHelper\r\n");
             sb.Append("{\r\n");
 
             for (int i = 0; i < m_DataTableNameList.Count; i++)
             {
                 if (!string.IsNullOrEmpty(m_DataTableNameList[i]))
                 {
-                    sb.AppendFormat("\tpublic static {0}Data[] {1}Data = null;", m_DataTableNameList[i], m_DataTableNameList[i]);
+                    string fieldName = m_DataTableNameList[i].Substring(0, 1).ToLower() + m_DataTableNameList[i].Substring(1);
+                    sb.AppendFormat("\tpublic static {0}ConfigData[] {1}ConfigDatas = null;", m_DataTableNameList[i], fieldName);
                     sb.Append("\r\n");
                 }
             }
@@ -249,12 +254,12 @@ namespace ExcelExport.Exporter
             {
                 if (!string.IsNullOrEmpty(m_DataTableNameList[i]))
                 {
-                    sb.AppendFormat("\t\t{0}Data = LoadData<{1}Data>(filePath, \"{2}Data.bytes\");\r\n", m_DataTableNameList[i], m_DataTableNameList[i], m_DataTableNameList[i]);
+                    string fieldName = m_DataTableNameList[i].Substring(0, 1).ToLower() + m_DataTableNameList[i].Substring(1);
+                    sb.AppendFormat("\t\t{0}ConfigDatas = LoadConfigData<{1}ConfigData>(filePath, \"{2}ConfigData\");\r\n", fieldName, m_DataTableNameList[i], m_DataTableNameList[i]);
                 }
             }
 
             sb.Append("\t}\r\n");
-            sb.Append("\r\n");
 
             //sb.Append("\tpublic static T[] LoadData<T>(string filePath, string fileName) where T : BaseLocalData, new()\r\n");
             //sb.Append("\t{\r\n");
@@ -277,20 +282,29 @@ namespace ExcelExport.Exporter
 
             sb.Append("}\r\n");
 
-            using (FileStream fs = new FileStream(string.Format("{0}/C#/Script/DataHelper.cs", m_ExportPath), FileMode.Create))
+            using (FileStream fs = new FileStream(string.Format("{0}/C#/Script/ConfigDataHelper.cs", m_ExportPath), FileMode.Create))
             {
                 using (StreamWriter sw = new StreamWriter(fs))
                 {
                     sw.Write(sb.ToString());
                 }
             }
+
+            sb.Clear();
         }
 
-        private void ParseJson(LitJson.JsonData json, JsonStruct jsonStruct)
+        private void ParseJson(LitJson.JsonData jsonData, JsonStruct jsonStruct)
         {
-            if (json.IsObject)
+            if (jsonData.IsArray)
             {
-                foreach (KeyValuePair<string, LitJson.JsonData> kvp in json)
+                for (int i = 0; i < jsonData.Count; i++)
+                {
+                    ParseJson(jsonData[i], jsonStruct);
+                }
+            }
+            else if (jsonData.Keys.Count > 0)
+            {
+                foreach (KeyValuePair<string, LitJson.JsonData> kvp in jsonData)
                 {
                     string key = kvp.Key;
                     LitJson.JsonData val = kvp.Value;
@@ -301,7 +315,7 @@ namespace ExcelExport.Exporter
                     {
                         fieldType = key.Substring(0, 1).ToUpper() + key.Substring(1);
 
-                        if(jsonStruct.jsonStructList == null)
+                        if (jsonStruct.jsonStructList == null)
                         {
                             jsonStruct.jsonStructList = new List<JsonStruct>();
                         }
@@ -334,13 +348,6 @@ namespace ExcelExport.Exporter
                             jsonStruct.fields.Add(fieldName, fieldType);
                         }
                     }
-                }
-            }
-            else if(json.IsArray)
-            {
-                for (int i = 0; i < json.Count; i++)
-                {
-                    ParseJson(json[i], jsonStruct);
                 }
             }
         }
@@ -431,54 +438,49 @@ namespace ExcelExport.Exporter
             sb.Append("}\r\n");
         }
 
-        private string ChangeTypeName(string type)
+        private string GetTypeName(string typeName)
         {
-            string str = string.Empty;
-
-            switch (type)
+            return typeName.ToLower() switch
             {
-                case "int":
-                    str = ".ToInt()";
-                    break;
-                case "long":
-                    str = ".ToLong()";
-                    break;
-                case "float":
-                    str = ".ToFloat()";
-                    break;
-                case "double":
-                    str = ".ToDouble()";
-                    break;
-                case "bool":
-                    str = ".ToBool()";
-                    break;
-                case "Vector2":
-                    str = ".ToVector2()";
-                    break;
-                case "Vector3":
-                    str = ".ToVector3()";
-                    break;
-                case "int[]":
-                    str = ".ToIntArray()";
-                    break;
-                case "long[]":
-                    str = ".ToLongArray()";
-                    break;
-                case "float[]":
-                    str = ".ToFloatArray()";
-                    break;
-                case "double[]":
-                    str = ".ToDoubleArray()";
-                    break;
-                case "bool[]":
-                    str = ".ToBoolArray()";
-                    break;
-                case "string[]":
-                    str = ".ToStringArray()";
-                    break;
-            }
+                "int" => "int",
+                "long" => "long",
+                "float" => "float",
+                "double" => "double",
+                "bool" => "bool",
+                "string" => "string",
+                "vector2" => "Vector2",
+                "vector3" => "Vector3",
+                "int[]" => "int[]",
+                "long[]" => "long[]",
+                "float[]" => "float[]",
+                "double[]" => "double[]",
+                "bool[]" => "bool[]",
+                "string[]" => "string[]",
+                "json" => "json",
+                _ => string.Empty,
+            };
+        }
 
-            return str;
+        private string GetTypeParseStr(string typeName)
+        {
+            return typeName.ToLower() switch
+            {
+                "int" => ".ToInt()",
+                "long" => ".ToLong()",
+                "float" => ".ToFloat()",
+                "double" => ".ToDouble()",
+                "bool" => ".ToBool()",
+                "string" => string.Empty,
+                "vector2" => ".ToVector2()",
+                "vector3" => ".ToVector3()",
+                "int[]" => ".ToIntArray()",
+                "long[]" => ".ToLongArray()",
+                "float[]" => ".ToFloatArray()",
+                "double[]" => ".ToDoubleArray()",
+                "bool[]" => ".ToBoolArray()",
+                "string[]" => ".ToStringArray()",
+                _ => string.Empty,
+            };
         }
 
 
