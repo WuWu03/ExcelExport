@@ -116,11 +116,11 @@ namespace ExcelExport.Exporter
             {
                 string typeName = GetTypeName(dataArr[i, 1]);
 
-                if (typeName.Equals("json"))
+                if (typeName.Contains("json"))
                 {
                     typeName = dataArr[i, 0].Substring(0, 1).ToUpper() + dataArr[i, 0].Substring(1);
 
-                    for (int j = 3; j < dt.Rows.Count; j++)
+                    for (int j = 4; j < dt.Rows.Count; j++)
                     {
                         string jsonStr = dt.Rows[j][i + 1].ToString();
 
@@ -147,9 +147,16 @@ namespace ExcelExport.Exporter
             {
                 string typeName = GetTypeName(dataArr[i, 1]);
 
-                if (typeName.Equals("json"))
+                if (typeName.Contains("json"))
                 {
-                    typeName = dataArr[i, 0].Substring(0, 1).ToUpper() + dataArr[i, 0].Substring(1);
+                    string listSymbol = string.Empty;
+
+                    if (typeName.Contains("[]"))
+                    {
+                        listSymbol = "[]";
+                    }
+
+                    typeName = dataArr[i, 0].Substring(0, 1).ToUpper() + dataArr[i, 0].Substring(1) + listSymbol;  
                 }
 
                 sb.Append("\t/// <summary>\r\n");
@@ -191,9 +198,16 @@ namespace ExcelExport.Exporter
                 string fieldName = dataArr[i, 0].Substring(0, 1).ToLower() + dataArr[i, 0].Substring(1);
                 string typeName = GetTypeName(dataArr[i, 1]);
 
-                if (typeName.Equals("json"))
+                if (typeName.Contains("json"))
                 {
-                    typeName = dataArr[i, 0].Substring(0, 1).ToUpper() + dataArr[i, 0].Substring(1);
+                    string listSymbol = string.Empty;
+
+                    if (typeName.Contains("[]"))
+                    {
+                        listSymbol = "[]";
+                    }
+
+                    typeName = dataArr[i, 0].Substring(0, 1).ToUpper() + dataArr[i, 0].Substring(1) + listSymbol;
                     sb.AppendFormat("\t\tthis.{0} = JsonMapper.ToObject<{1}>(parser.GetFieldValue(\"{0}\"));\r\n", fieldName, typeName);
                 }
                 else
@@ -306,7 +320,7 @@ namespace ExcelExport.Exporter
             {
                 foreach (KeyValuePair<string, LitJson.JsonData> kvp in jsonData)
                 {
-                    string key = kvp.Key;
+                    string key = kvp.Key.Trim();
                     LitJson.JsonData val = kvp.Value;
                     string fieldType = JsonFieldType(val);
                     string fieldName = key.Substring(0, 1).ToLower() + key.Substring(1);
@@ -320,24 +334,27 @@ namespace ExcelExport.Exporter
                             jsonStruct.jsonStructList = new List<JsonStruct>();
                         }
 
-                        JsonStruct childJsonStruct = new JsonStruct();
-                        childJsonStruct.className = fieldType;
-                        jsonStruct.jsonStructList.Add(childJsonStruct);
+                        JsonStruct childJsonStruct = null;
 
-                        if (val.IsArray)
+                        for (int i = 0; i < jsonStruct.jsonStructList.Count; i++)
                         {
-                            if (!jsonStruct.fields.ContainsKey(fieldName))
+                            if (jsonStruct.jsonStructList[i].className.Equals(fieldType))
                             {
-                                jsonStruct.fields.Add(fieldName, fieldType + "[]");
+                                childJsonStruct = jsonStruct.jsonStructList[i];
+                                break;
                             }
-                            ParseJson(val, childJsonStruct);
                         }
-                        else
+
+                        if(childJsonStruct == null)
                         {
-                            if (!jsonStruct.fields.ContainsKey(fieldName))
-                            {
-                                jsonStruct.fields.Add(fieldName, fieldType);
-                            }
+                            childJsonStruct = new JsonStruct();
+                            childJsonStruct.className = fieldType;
+                            jsonStruct.jsonStructList.Add(childJsonStruct);
+                        }
+
+                        if (!jsonStruct.fields.ContainsKey(fieldName))
+                        {
+                            jsonStruct.fields.Add(fieldName, fieldType + (val.IsArray ? "[]" : string.Empty));
                             ParseJson(val, childJsonStruct);
                         }
                     }
@@ -401,7 +418,7 @@ namespace ExcelExport.Exporter
             {
                 sb.Append("\t");
             }
-            sb.AppendFormat("public class {0} \r\n", jsonStruct.className);
+            sb.AppendFormat("public class {0}\r\n", jsonStruct.className);
 
             for (int i = 0; i < tCount; i++)
             {
@@ -457,6 +474,7 @@ namespace ExcelExport.Exporter
                 "bool[]" => "bool[]",
                 "string[]" => "string[]",
                 "json" => "json",
+                "json[]" => "json[]",
                 _ => string.Empty,
             };
         }
@@ -482,7 +500,6 @@ namespace ExcelExport.Exporter
                 _ => string.Empty,
             };
         }
-
 
         class JsonStruct
         {
