@@ -358,12 +358,9 @@ namespace ExcelExport.Exporter
                             ParseJson(val, childJsonStruct);
                         }
                     }
-                    else
+                    else if (!jsonStruct.fields.ContainsKey(fieldName))
                     {
-                        if (!jsonStruct.fields.ContainsKey(fieldName))
-                        {
-                            jsonStruct.fields.Add(fieldName, fieldType);
-                        }
+                        jsonStruct.fields.Add(fieldName, fieldType);
                     }
                 }
             }
