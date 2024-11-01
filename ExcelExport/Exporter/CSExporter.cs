@@ -269,12 +269,26 @@ namespace ExcelExport.Exporter
                 if (!string.IsNullOrEmpty(m_DataTableNameList[i]))
                 {
                     string fieldName = m_DataTableNameList[i].Substring(0, 1).ToLower() + m_DataTableNameList[i].Substring(1);
-                    sb.AppendFormat("\t\t{0}ConfigDatas = LoadConfigData<{1}ConfigData>(filePath, \"{2}ConfigData\");\r\n", fieldName, m_DataTableNameList[i], m_DataTableNameList[i]);
+                    sb.AppendFormat("\t\t{0}ConfigDatas = LoadConfigData<{1}ConfigData>(filePath, \"{2}ConfigData.bytes\");\r\n", fieldName, m_DataTableNameList[i], m_DataTableNameList[i]);
                 }
             }
 
             sb.Append("\t}\r\n");
 
+            sb.Append("\r\n");
+            sb.Append("\tpublic static void ShutDown()\r\n");
+            sb.Append("\t{\r\n");
+
+            for (int i = 0; i < m_DataTableNameList.Count; i++)
+            {
+                if (!string.IsNullOrEmpty(m_DataTableNameList[i]))
+                {
+                    string fieldName = m_DataTableNameList[i].Substring(0, 1).ToLower() + m_DataTableNameList[i].Substring(1);
+                    sb.AppendFormat("\t\t{0}ConfigDatas = null;\r\n", fieldName);
+                }
+            }
+
+            sb.Append("\t}\r\n");
             //sb.Append("\tpublic static T[] LoadData<T>(string filePath, string fileName) where T : BaseLocalData, new()\r\n");
             //sb.Append("\t{\r\n");
             //sb.Append("\t\tstring path = string.Format(filePath + \"/{0}\", fileName);\r\n");
