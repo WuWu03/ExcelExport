@@ -1,6 +1,5 @@
 ﻿using ExcelExport.Helper;
 using ExcelExport.LitJson;
-using SixLabors.ImageSharp.Memory;
 using System;
 using System.Collections.Generic;
 using System.Data;
