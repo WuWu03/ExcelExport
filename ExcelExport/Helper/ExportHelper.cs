@@ -22,10 +22,10 @@ namespace ExcelExport.Helper
 
             s_CanExportList.Add(true);
 
-            for(int i = 0; i < m_Exporters.Length; i++)
+            for (int i = 0; i < m_Exporters.Length; i++)
             {
                 m_Exporters[i].AddExcel(excelPath);
-            }     
+            }
         }
 
         public static void ResetExcel()
@@ -68,7 +68,7 @@ namespace ExcelExport.Helper
         }
 
         private static int m_CurrExporterIndex = 0;
-        private static BaseExporter[] m_Exporters = new BaseExporter[] { new CSExporter(), new LuaExporter() };
+        private static BaseExporter[] m_Exporters = new BaseExporter[] { new CSExporter(), new LuaExporter()};
         private static List<bool> s_CanExportList = null;
     }
 }

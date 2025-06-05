@@ -1,7 +1,6 @@
-﻿using System.Collections;
-using ComponentAce.Compression.Libs.zlib;
-using System.IO;
+﻿using ComponentAce.Compression.Libs.zlib;
 using System;
+using System.IO;
 
 namespace ExcelExport.Helper
 {

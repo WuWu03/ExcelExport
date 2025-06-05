@@ -1,12 +1,8 @@
-﻿using LitJson;
-using NPOI.SS.Formula.Eval;
-using System;
+﻿using ExcelExport.LitJson;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ExcelExport.Exporter
 {
@@ -107,7 +103,7 @@ namespace ExcelExport.Exporter
                 {
                     fieldValueTemp = "\"" + fieldValue.Replace(" ", "").Replace(",", "\",\n\t\t\t\"") + "\"";
                 }
-                else if(fieldType.Contains("bool"))
+                else if (fieldType.Contains("bool"))
                 {
                     fieldValueTemp = fieldValueTemp.ToLower();
                 }
@@ -124,12 +120,12 @@ namespace ExcelExport.Exporter
                 {
                     result += string.Format("{0} = {1}", vectorFieldName[i], vectorValues[i]);
 
-                    if(i < vectorValues.Length - 1)
+                    if (i < vectorValues.Length - 1)
                     {
                         result += ",";
                     }
                 }
-                
+
 
                 return result + "},";
             }
@@ -233,6 +229,11 @@ namespace ExcelExport.Exporter
 
             sb.AppendFormat("{0}\n", GetFieldStr(fieldName, fieldValueStr, fieldType));
             return true;
+        }
+
+        protected override void ExportLanguageData(DataTable dt, string excelName, string sheetName)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

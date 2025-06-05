@@ -9,7 +9,7 @@
 #endregion
 
 
-namespace LitJson
+namespace ExcelExport.LitJson
 {
     internal enum ParserToken
     {

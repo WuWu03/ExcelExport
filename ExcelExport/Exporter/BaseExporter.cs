@@ -78,22 +78,15 @@ namespace ExcelExport.Exporter
                     continue;
                 }
 
-
-                if (dt.Rows[3][0].ToString().Contains("BAN"))
+                if (dt.Rows[3][0].ToString().ToLower().Equals("ban"))
                 {
                     continue;
                 }
 
-                string excelName = Path.GetFileName(filePath);
-                string sheetName = dt.TableName;
-                string dataTableName = dt.Rows[1][0].ToString();
-         
-                m_DataTableNameList.Add(dataTableName);
-
                 //每行第一列如果填入BAN则此行不导出
                 for (int row = dt.Rows.Count - 1; row > 3; row--)
                 {
-                    if (dt.Rows[row][0].ToString().Contains("BAN"))
+                    if (dt.Rows[row][0].ToString().ToLower().Equals("ban"))
                     {
                         dt.Rows.RemoveAt(row);
                     }
@@ -102,18 +95,31 @@ namespace ExcelExport.Exporter
                 //每列的第三行如果填入BAN则此列不导出(第一列为id，强制导出)
                 for (int col = dt.Columns.Count - 1; col > 0; col--)
                 {
-                    if (col > 1 && dt.Rows[3][col].ToString().Contains("BAN"))
+                    if (col > 1 && dt.Rows[3][col].ToString().ToLower().Equals("ban"))
                     {
                         dt.Columns.RemoveAt(col);
                     }
                 }
 
-                ExportData(dt, excelName, sheetName);
+                string excelName = Path.GetFileName(filePath);
+                string sheetName = dt.TableName;
+                string dataTableName = dt.Rows[1][0].ToString();
+
+                if (dt.Rows[3][0].ToString().ToLower().Equals("language"))
+                {
+                    ExportLanguageData(dt, excelName, sheetName);
+                }
+                else
+                {
+                    m_DataTableNameList.Add(dataTableName);
+                    ExportData(dt, excelName, sheetName);
+                }
             }
         }
 
         protected abstract void CreateExportPath();
         protected abstract void ExportData(DataTable dt, string excelName, string sheetName);
+        protected abstract void ExportLanguageData(DataTable dt, string excelName, string sheetName);
         protected abstract void CreateDataHelperScript();
 
         protected string m_ExportPath = string.Empty;

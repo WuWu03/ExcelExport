@@ -55,12 +55,12 @@ namespace ExcelExport.Helper
 
         public static string[] GetCurrConfig()
         {
-            if(s_ConfigData == null || s_ConfigData.Count < 1)
+            if (s_ConfigData == null || s_ConfigData.Count < 1)
             {
                 return null;
             }
 
-            if(s_CurrSelectIndex < 0 || s_CurrSelectIndex >= s_ConfigData.Count)
+            if (s_CurrSelectIndex < 0 || s_CurrSelectIndex >= s_ConfigData.Count)
             {
                 return null;
             }
@@ -101,7 +101,7 @@ namespace ExcelExport.Helper
             s_ConfigData.RemoveAt(s_CurrSelectIndex);
             s_CurrSelectIndex--;
 
-            if(s_CurrSelectIndex < 0)
+            if (s_CurrSelectIndex < 0)
             {
                 s_CurrSelectIndex = 0;
             }
@@ -109,7 +109,7 @@ namespace ExcelExport.Helper
             SetXmlNode(doc);
         }
 
-        public static void ModifyPahtConfig(string configName, string excelPath,string exportPath)
+        public static void ModifyPahtConfig(string configName, string excelPath, string exportPath)
         {
             s_ConfigData[s_CurrSelectIndex][0] = configName;
             s_ConfigData[s_CurrSelectIndex][1] = excelPath;
@@ -126,7 +126,7 @@ namespace ExcelExport.Helper
         }
 
         private static void SetXmlNode(XmlDocument doc)
-        {   
+        {
             XmlNode indexNode = null;
 
             if (doc.ChildNodes[1].ChildNodes.Count < 2)

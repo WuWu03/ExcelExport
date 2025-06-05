@@ -1,10 +1,6 @@
-﻿using ExcelExport;
-using ExcelExport.Helper;
-using LitJson;
+﻿using ExcelExport.Helper;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 
 namespace ExcelExport
@@ -20,8 +16,8 @@ namespace ExcelExport
             ConfigHelper.InitConfig();
 
             this.codeTypeComboBox.SelectedIndex = 0;
- 
-            for (int i = 0;i < ConfigHelper.ConfigData.Count;i++)
+
+            for (int i = 0; i < ConfigHelper.ConfigData.Count; i++)
             {
                 this.configListComboBox.Items.Add(ConfigHelper.ConfigData[i][0]);
             }
@@ -45,7 +41,7 @@ namespace ExcelExport
             string excelPath = string.Empty;
             string[] configData = ConfigHelper.GetCurrConfig();
 
-            if(configData != null)
+            if (configData != null)
             {
                 excelPath = configData[1];
             }
@@ -56,12 +52,11 @@ namespace ExcelExport
                 return;
             }
 
-            using(FolderBrowserDialog fbDlg = new FolderBrowserDialog())
+            using FolderBrowserDialog fbDlg = new FolderBrowserDialog();
+
+            if (fbDlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                if (fbDlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    LoadExcelFiles(fbDlg.SelectedPath);
-                }
+                LoadExcelFiles(fbDlg.SelectedPath);
             }
         }
 
@@ -171,7 +166,7 @@ namespace ExcelExport
         /// <param name="e"></param>
         private void OnBtnDeletePathConfigClick(object sender, EventArgs e)
         {
-            if(MessageBox.Show("确认删除本条配置？","警告",MessageBoxButtons.YesNo,MessageBoxIcon.Question) == DialogResult.Yes)
+            if (MessageBox.Show("确认删除本条配置？", "警告", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 int selectedIndex = configListComboBox.SelectedIndex;
                 configListComboBox.Items.RemoveAt(configListComboBox.SelectedIndex);
@@ -302,7 +297,7 @@ namespace ExcelExport
         /// <param name="e"></param>
         private void OnTextBoxExportDragDrop(object sender, DragEventArgs e)
         {
-            string exportPath = ((System.Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString(); 
+            string exportPath = ((System.Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
 
             textBoxExport.Text = exportPath;
         }
@@ -318,7 +313,7 @@ namespace ExcelExport
             btnModifyPathConfig.Visible = !showAddPathBtn;
             btnDelectPathConfig.Visible = !showAddPathBtn;
             btnAddPathConfig.Visible = showAddPathBtn;
-       
+
             if (showAddPathBtn)
             {
                 textBoxExcel.Text = string.Empty;
@@ -335,7 +330,7 @@ namespace ExcelExport
             }
         }
 
-    
+
 
         //异或因子
         //private byte[] xorScale = new byte[] { 45, 66, 38, 55, 23, 254, 9, 165, 90, 19, 41, 45, 201, 58, 55, 37, 254, 185, 165, 169, 19, 171 };//.data文件的xor加解密因子

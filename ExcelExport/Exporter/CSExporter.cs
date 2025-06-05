@@ -1,12 +1,11 @@
 ﻿using ExcelExport.Helper;
-using Microsoft.VisualBasic.FileIO;
+using ExcelExport.LitJson;
+using SixLabors.ImageSharp.Memory;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ExcelExport.Exporter
 {
@@ -37,8 +36,29 @@ namespace ExcelExport.Exporter
 
         protected override void ExportData(DataTable dt, string excelName, string sheetName)
         {
-            byte[] buffer = null;
             string dataTableName = dt.Rows[1][0].ToString();
+            byte[] buffer = GetDataBuffer(dt, excelName, sheetName);
+            //写入文件
+            FileStream fs = new FileStream(string.Format("{0}/C#/Data/{1}ConfigData.bytes", m_ExportPath, dataTableName), FileMode.Create);
+            fs.Write(buffer, 0, buffer.Length);
+            fs.Close();
+
+            CreateDataScript(dt, excelName, sheetName);
+        }
+
+        protected override void ExportLanguageData(DataTable dt, string excelName, string sheetName)
+        {
+            string dataTableName = dt.Rows[1][0].ToString();
+            byte[] buffer = GetDataBuffer(dt, excelName, sheetName);
+            //写入文件
+            FileStream fs = new FileStream(string.Format("{0}/C#/Data/{1}LanguageData.bytes", m_ExportPath, dataTableName), FileMode.Create);
+            fs.Write(buffer, 0, buffer.Length);
+            fs.Close();
+        }
+
+        private byte[] GetDataBuffer(DataTable dt, string excelName, string sheetName)
+        {
+            byte[] buffer = null;
 
             using (MemoryStreamEx mse = new MemoryStreamEx())
             {
@@ -63,13 +83,7 @@ namespace ExcelExport.Exporter
 
             //压缩
             buffer = ZlibHelper.CompressBytes(buffer);
-
-            //写入文件
-            FileStream fs = new FileStream(string.Format("{0}/C#/Data/{1}ConfigData.bytes", m_ExportPath, dataTableName), FileMode.Create);
-            fs.Write(buffer, 0, buffer.Length);
-            fs.Close();
-
-            CreateDataScript(dt, excelName, sheetName);
+            return buffer;
         }
 
         /// <summary>
@@ -118,7 +132,7 @@ namespace ExcelExport.Exporter
 
                 if (typeName.Contains("json"))
                 {
-                    typeName = dataArr[i, 0].Substring(0, 1).ToUpper() + dataArr[i, 0].Substring(1);
+                    typeName = string.Concat(dataArr[i, 0][..1].ToUpper(), dataArr[i, 0].AsSpan(1));
 
                     for (int j = 4; j < dt.Rows.Count; j++)
                     {
@@ -135,9 +149,11 @@ namespace ExcelExport.Exporter
 
             foreach (KeyValuePair<string, string> kvp in jsonDic)
             {
-                LitJson.JsonData obj = LitJson.JsonMapper.ToObject(kvp.Value);
-                JsonStruct jsonStruct = new JsonStruct();
-                jsonStruct.className = kvp.Key;
+                JsonData obj = JsonMapper.ToObject(kvp.Value);
+                JsonStruct jsonStruct = new JsonStruct
+                {
+                    className = kvp.Key
+                };
                 ParseJson(obj, jsonStruct);
                 CreateJsonCode(jsonStruct, sb);
             }
@@ -156,7 +172,7 @@ namespace ExcelExport.Exporter
                         listSymbol = "[]";
                     }
 
-                    typeName = dataArr[i, 0].Substring(0, 1).ToUpper() + dataArr[i, 0].Substring(1) + listSymbol;  
+                    typeName = string.Concat(dataArr[i, 0][..1].ToUpper(), dataArr[i, 0].AsSpan(1), listSymbol);
                 }
 
                 sb.Append("\t/// <summary>\r\n");
@@ -168,7 +184,7 @@ namespace ExcelExport.Exporter
 
             //生成克隆代码
 
-            string variableName = dataTableName.Substring(0, 1).ToLower() + dataTableName.Substring(1);
+            string variableName = string.Concat(dataTableName[..1].ToLower(), dataTableName.AsSpan(1));
 
             sb.AppendFormat("\tpublic {0}ConfigData Clone()\r\n", dataTableName);
             sb.Append("\t{\r\n");
@@ -195,7 +211,7 @@ namespace ExcelExport.Exporter
                     continue;
                 }
 
-                string fieldName = dataArr[i, 0].Substring(0, 1).ToLower() + dataArr[i, 0].Substring(1);
+                string fieldName = string.Concat(dataArr[i, 0][..1].ToLower(), dataArr[i, 0].AsSpan(1));
                 string typeName = GetTypeName(dataArr[i, 1]);
 
                 if (typeName.Contains("json"))
@@ -207,7 +223,7 @@ namespace ExcelExport.Exporter
                         listSymbol = "[]";
                     }
 
-                    typeName = dataArr[i, 0].Substring(0, 1).ToUpper() + dataArr[i, 0].Substring(1) + listSymbol;
+                    typeName = string.Concat(dataArr[i, 0][..1].ToUpper(), dataArr[i, 0].AsSpan(1), listSymbol);
                     sb.AppendFormat("\t\tthis.{0} = JsonMapper.ToObject<{1}>(parser.GetFieldValue(\"{0}\"));\r\n", fieldName, typeName);
                 }
                 else
@@ -220,13 +236,9 @@ namespace ExcelExport.Exporter
             sb.Append("}\r\n");
 
             //写入文件
-            using (FileStream fs = new FileStream(string.Format("{0}/C#/Script/{1}ConfigData.cs", m_ExportPath, dataTableName), FileMode.Create))
-            {
-                using (StreamWriter sw = new StreamWriter(fs))
-                {
-                    sw.Write(sb.ToString());
-                }
-            }
+            using FileStream fs = new FileStream(string.Format("{0}/C#/Script/{1}ConfigData.cs", m_ExportPath, dataTableName), FileMode.Create);
+            using StreamWriter sw = new StreamWriter(fs);
+            sw.Write(sb.ToString());
         }
 
         /// <summary>
@@ -254,7 +266,7 @@ namespace ExcelExport.Exporter
             {
                 if (!string.IsNullOrEmpty(m_DataTableNameList[i]))
                 {
-                    string fieldName = m_DataTableNameList[i].Substring(0, 1).ToLower() + m_DataTableNameList[i].Substring(1);
+                    string fieldName = string.Concat(m_DataTableNameList[i][..1].ToLower(), m_DataTableNameList[i].AsSpan(1));
                     sb.AppendFormat("\tpublic static {0}ConfigData[] {1}ConfigDatas = null;", m_DataTableNameList[i], fieldName);
                     sb.Append("\r\n");
                 }
@@ -268,7 +280,7 @@ namespace ExcelExport.Exporter
             {
                 if (!string.IsNullOrEmpty(m_DataTableNameList[i]))
                 {
-                    string fieldName = m_DataTableNameList[i].Substring(0, 1).ToLower() + m_DataTableNameList[i].Substring(1);
+                    string fieldName = string.Concat(m_DataTableNameList[i][..1].ToLower(), m_DataTableNameList[i].AsSpan(1));
                     sb.AppendFormat("\t\t{0}ConfigDatas = LoadConfigData<{1}ConfigData>(filePath, \"{2}ConfigData\");\r\n", fieldName, m_DataTableNameList[i], m_DataTableNameList[i]);
                 }
             }
@@ -298,10 +310,8 @@ namespace ExcelExport.Exporter
 
             using (FileStream fs = new FileStream(string.Format("{0}/C#/Script/ConfigDataHelper.cs", m_ExportPath), FileMode.Create))
             {
-                using (StreamWriter sw = new StreamWriter(fs))
-                {
-                    sw.Write(sb.ToString());
-                }
+                using StreamWriter sw = new StreamWriter(fs);
+                sw.Write(sb.ToString());
             }
 
             sb.Clear();
@@ -323,16 +333,13 @@ namespace ExcelExport.Exporter
                     string key = kvp.Key.Trim();
                     LitJson.JsonData val = kvp.Value;
                     string fieldType = JsonFieldType(val);
-                    string fieldName = key.Substring(0, 1).ToLower() + key.Substring(1);
+                    string fieldName = string.Concat(key[..1].ToLower(), key.AsSpan(1));
 
                     if (string.IsNullOrEmpty(fieldType))
                     {
-                        fieldType = key.Substring(0, 1).ToUpper() + key.Substring(1);
+                        fieldType = string.Concat(key[..1].ToUpper(), key.AsSpan(1));
 
-                        if (jsonStruct.jsonStructList == null)
-                        {
-                            jsonStruct.jsonStructList = new List<JsonStruct>();
-                        }
+                        jsonStruct.jsonStructList ??= new List<JsonStruct>();
 
                         JsonStruct childJsonStruct = null;
 
@@ -345,10 +352,12 @@ namespace ExcelExport.Exporter
                             }
                         }
 
-                        if(childJsonStruct == null)
+                        if (childJsonStruct == null)
                         {
-                            childJsonStruct = new JsonStruct();
-                            childJsonStruct.className = fieldType;
+                            childJsonStruct = new JsonStruct
+                            {
+                                className = fieldType
+                            };
                             jsonStruct.jsonStructList.Add(childJsonStruct);
                         }
 
@@ -358,10 +367,7 @@ namespace ExcelExport.Exporter
                             ParseJson(val, childJsonStruct);
                         }
                     }
-                    else if (!jsonStruct.fields.ContainsKey(fieldName))
-                    {
-                        jsonStruct.fields.Add(fieldName, fieldType);
-                    }
+                    else jsonStruct.fields.TryAdd(fieldName, fieldType);
                 }
             }
         }
@@ -397,7 +403,7 @@ namespace ExcelExport.Exporter
             {
                 fieldType = "string";
             }
-            else if(fieldValue.IsArray && fieldValue.Count > 0)
+            else if (fieldValue.IsArray && fieldValue.Count > 0)
             {
                 string typeTemp = JsonFieldType(fieldValue[0]);
                 if (!string.IsNullOrEmpty(typeTemp))
@@ -413,13 +419,13 @@ namespace ExcelExport.Exporter
         {
             for (int i = 0; i < tCount; i++)
             {
-                sb.Append("\t");
+                sb.Append('\t');
             }
             sb.AppendFormat("public class {0}\r\n", jsonStruct.className);
 
             for (int i = 0; i < tCount; i++)
             {
-                sb.Append("\t");
+                sb.Append('\t');
             }
 
             sb.Append("{\r\n");
@@ -434,11 +440,11 @@ namespace ExcelExport.Exporter
                 sb.Append("\r\n");
             }
 
-            foreach (KeyValuePair<string,string> kvp in jsonStruct.fields)
+            foreach (KeyValuePair<string, string> kvp in jsonStruct.fields)
             {
                 for (int i = 0; i < tCount + 1; i++)
                 {
-                    sb.Append("\t");
+                    sb.Append('\t');
                 }
 
                 sb.AppendFormat("public {0} {1} {{ get; set; }}\r\n", kvp.Value, kvp.Key);
@@ -446,7 +452,7 @@ namespace ExcelExport.Exporter
 
             for (int i = 0; i < tCount; i++)
             {
-                sb.Append("\t");
+                sb.Append('\t');
             }
 
             sb.Append("}\r\n");

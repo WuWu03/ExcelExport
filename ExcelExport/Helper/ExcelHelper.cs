@@ -31,9 +31,9 @@ namespace ExcelExport.Helper
                     workbook = new HSSFWorkbook(fs);
                 }
 
-                if (workbook == null) 
-                { 
-                    return null; 
+                if (workbook == null)
+                {
+                    return null;
                 }
 
                 if (workbook.NumberOfSheets < 1)
@@ -79,13 +79,13 @@ namespace ExcelExport.Helper
                         bool hasValue = false;
                         foreach (int k in columns)
                         {
-                            IRow row = sheet.GetRow(j); 
+                            IRow row = sheet.GetRow(j);
 
-                            if(row != null)
+                            if (row != null)
                             {
                                 dr[k] = GetValueType(row.GetCell(k));
                             }
-                      
+
                             if (dr[k] != null && dr[k].ToString() != string.Empty)
                             {
                                 hasValue = true;
