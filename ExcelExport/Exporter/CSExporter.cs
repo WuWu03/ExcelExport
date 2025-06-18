@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Text;
+using System.Windows.Forms;
 
 namespace ExcelExport.Exporter
 {
@@ -38,9 +39,16 @@ namespace ExcelExport.Exporter
             string dataTableName = dt.Rows[1][0].ToString();
             byte[] buffer = GetDataBuffer(dt, excelName, sheetName);
             //写入文件
-            FileStream fs = new FileStream(string.Format("{0}/C#/Data/{1}ConfigData.bytes", m_ExportPath, dataTableName), FileMode.Create);
-            fs.Write(buffer, 0, buffer.Length);
-            fs.Close();
+            try
+            {
+                FileStream fs = new FileStream(string.Format("{0}/C#/Data/{1}ConfigData.bytes", m_ExportPath, dataTableName), FileMode.Create);
+                fs.Write(buffer, 0, buffer.Length);
+                fs.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
 
             CreateDataScript(dt, excelName, sheetName);
         }
@@ -49,10 +57,18 @@ namespace ExcelExport.Exporter
         {
             string dataTableName = dt.Rows[1][0].ToString();
             byte[] buffer = GetDataBuffer(dt, excelName, sheetName);
+
             //写入文件
-            FileStream fs = new FileStream(string.Format("{0}/C#/Data/{1}LanguageData.bytes", m_ExportPath, dataTableName), FileMode.Create);
-            fs.Write(buffer, 0, buffer.Length);
-            fs.Close();
+            try
+            {
+                FileStream fs = new FileStream(string.Format("{0}/C#/Data/{1}LanguageData.bytes", m_ExportPath, dataTableName), FileMode.Create);
+                fs.Write(buffer, 0, buffer.Length);
+                fs.Close();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         private byte[] GetDataBuffer(DataTable dt, string excelName, string sheetName)
@@ -235,9 +251,19 @@ namespace ExcelExport.Exporter
             sb.Append("}\r\n");
 
             //写入文件
-            using FileStream fs = new FileStream(string.Format("{0}/C#/Script/{1}ConfigData.cs", m_ExportPath, dataTableName), FileMode.Create);
-            using StreamWriter sw = new StreamWriter(fs);
-            sw.Write(sb.ToString());
+
+            try
+            {
+
+                using FileStream fs = new FileStream(string.Format("{0}/C#/Script/{1}ConfigData.cs", m_ExportPath, dataTableName), FileMode.Create);
+                using StreamWriter sw = new StreamWriter(fs);
+                sw.Write(sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
         }
 
         /// <summary>
@@ -307,10 +333,15 @@ namespace ExcelExport.Exporter
 
             sb.Append("}\r\n");
 
-            using (FileStream fs = new FileStream(string.Format("{0}/C#/Script/ConfigDataHelper.cs", m_ExportPath), FileMode.Create))
+            try
             {
+                using FileStream fs = new FileStream(string.Format("{0}/C#/Script/ConfigDataHelper.cs", m_ExportPath), FileMode.Create);
                 using StreamWriter sw = new StreamWriter(fs);
                 sw.Write(sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
 
             sb.Clear();

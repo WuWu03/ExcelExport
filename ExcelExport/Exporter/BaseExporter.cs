@@ -1,7 +1,10 @@
 ﻿using ExcelExport.Helper;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Text;
+using System.Windows.Forms;
 
 namespace ExcelExport.Exporter
 {
@@ -58,6 +61,7 @@ namespace ExcelExport.Exporter
             }
 
             CreateDataHelperScript();
+            ExportLanguageKeys();
         }
 
         private void ExportData(string filePath)
@@ -107,6 +111,7 @@ namespace ExcelExport.Exporter
 
                 if (dt.Rows[3][0].ToString().ToLower().Equals("language"))
                 {
+                    m_LanguageDataTable = dt;
                     ExportLanguageData(dt, excelName, sheetName);
                 }
                 else
@@ -117,13 +122,53 @@ namespace ExcelExport.Exporter
             }
         }
 
+        private void ExportLanguageKeys()
+        {
+            if (m_LanguageDataTable == null)
+            {
+                return;
+            }
+
+            StringBuilder sb = new StringBuilder();
+
+            for (int i = 4; i < m_LanguageDataTable.Rows.Count; i++)
+            {
+                string keyName = m_LanguageDataTable.Rows[i][2].ToString().Trim();
+
+                if (i < m_LanguageDataTable.Rows.Count - 1)
+                {
+                    sb.AppendLine(keyName);
+                }
+                else
+                {
+                    sb.Append(keyName);
+                }
+            }
+
+            try
+            {
+                using FileStream fs = new FileStream(string.Format("{0}/C#/Data/LanguageKeys.txt", m_ExportPath), FileMode.Create);
+                using StreamWriter sw = new StreamWriter(fs);
+                sw.Write(sb.ToString());
+                sb.Clear();
+                m_LanguageDataTable = null;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
         protected abstract void CreateExportPath();
         protected abstract void ExportData(DataTable dt, string excelName, string sheetName);
         protected abstract void ExportLanguageData(DataTable dt, string excelName, string sheetName);
         protected abstract void CreateDataHelperScript();
 
         protected string m_ExportPath = string.Empty;
+
         protected List<string> m_DataTableNameList = null;
         protected List<string> m_ExcelList = null;
+
+        private DataTable m_LanguageDataTable = null;
     }
 }
