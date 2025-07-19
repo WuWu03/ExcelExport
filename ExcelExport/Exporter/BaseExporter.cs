@@ -40,6 +40,16 @@ namespace ExcelExport.Exporter
                 return;
             }
 
+            if (Directory.Exists(GetLanguageDataExprotPath()))
+            {
+                Directory.Delete(GetLanguageDataExprotPath(), true);
+                Directory.CreateDirectory(GetLanguageDataExprotPath());
+            }
+            else
+            {
+                Directory.CreateDirectory(GetLanguageDataExprotPath());
+            }
+
             CreateExportPath();
 
 
@@ -48,26 +58,31 @@ namespace ExcelExport.Exporter
                 m_DataTableNameList = new List<string>();
             }
 
-            m_DataTableNameList.Clear();
+            if (m_ListLanguageDataTable == null)
+            {
+                m_ListLanguageDataTable = new List<DataTable>();
+            }
 
+            m_DataTableNameList.Clear();
+            m_ListLanguageDataTable.Clear();
 
             for (int i = 0; i < m_ExcelList.Count; i++)
             {
 
                 if (canExportList != null && i < canExportList.Count && canExportList[i])
                 {
-                    ExportData(m_ExcelList[i]);
+                    BeforeExport(m_ExcelList[i]);
                 }
             }
 
-            CreateDataHelperScript();
+            CreateConfigDataSheetScript();
             ExportLanguageKeys();
         }
 
-        private void ExportData(string filePath)
+        private void BeforeExport(string filePath)
         {
             DataTable[] dts = ExcelHelper.ExcelToTable(filePath);
-
+            string allLanguageContent = string.Empty;
             if (dts == null || dts.Length < 1)
             {
                 return;
@@ -111,7 +126,7 @@ namespace ExcelExport.Exporter
 
                 if (dt.Rows[3][0].ToString().ToLower().Equals("language"))
                 {
-                    m_LanguageDataTable = dt;
+                    m_ListLanguageDataTable.Add(dt);
                     ExportLanguageData(dt, excelName, sheetName);
                 }
                 else
@@ -124,34 +139,48 @@ namespace ExcelExport.Exporter
 
         private void ExportLanguageKeys()
         {
-            if (m_LanguageDataTable == null)
+            if (m_ListLanguageDataTable == null)
             {
                 return;
             }
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder allKeysSB = new StringBuilder();
+            StringBuilder allContentSB = new StringBuilder();
 
-            for (int i = 4; i < m_LanguageDataTable.Rows.Count; i++)
+            bool hasAddAllKeys = false;
+            for (int i = 0; i < m_ListLanguageDataTable.Count; i++)
             {
-                string keyName = m_LanguageDataTable.Rows[i][2].ToString().Trim();
+                DataTable dt = m_ListLanguageDataTable[i];
 
-                if (i < m_LanguageDataTable.Rows.Count - 1)
+                for (int j = 4; j < dt.Rows.Count; j++)
                 {
-                    sb.AppendLine(keyName);
+                    if (!hasAddAllKeys)
+                    {
+                        string keyName = dt.Rows[j][2].ToString().Trim();
+
+                        if (j < dt.Rows.Count - 1)
+                        {
+                            allKeysSB.AppendLine(keyName);
+                        }
+                        else
+                        {
+                            allKeysSB.Append(keyName);
+                        }
+                    }
+
+                    allContentSB.Append(dt.Rows[j][3].ToString().Trim());
                 }
-                else
-                {
-                    sb.Append(keyName);
-                }
+
+                hasAddAllKeys = true;
             }
 
+            allContentSB.Append("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+[]{}|;':\",.<>?/`~");
             try
             {
-                using FileStream fs = new FileStream(string.Format("{0}/C#/Data/LanguageKeys.txt", m_ExportPath), FileMode.Create);
-                using StreamWriter sw = new StreamWriter(fs);
-                sw.Write(sb.ToString());
-                sb.Clear();
-                m_LanguageDataTable = null;
+                ExportLanguageFile(GetLanguageDataExprotPath(GetLanguageKeysName()), allKeysSB.ToString());
+                ExportLanguageFile(GetLanguageDataExprotPath(GetLanguageContentName()), allContentSB.ToString());
+                allKeysSB.Clear();
+                allContentSB.Clear();
             }
             catch (Exception ex)
             {
@@ -159,16 +188,46 @@ namespace ExcelExport.Exporter
             }
         }
 
+        private void ExportLanguageFile(string path, string content)
+        {
+            using FileStream fs = new FileStream(path, FileMode.Create);
+            using StreamWriter sw = new StreamWriter(fs);
+            sw.Write(content);
+        }
+
+
+        protected string GetLanguageDataExprotPath(string fileName = "")
+        {
+            return string.Format("{0}/{1}/LanguageDatas/{2}", m_ExportPath, m_ExportRootPath, fileName);
+        }
+
+        protected string GetLanguageDataName(string fileName, string ext)
+        {
+            return string.Format("{0}LanguageData{1}", fileName, ext);
+        }
+
+        private string GetLanguageKeysName()
+        {
+            return "LanguageKeys.txt";
+        }
+
+        private string GetLanguageContentName()
+        {
+            return "LanguageContent.txt";
+        }
+
         protected abstract void CreateExportPath();
         protected abstract void ExportData(DataTable dt, string excelName, string sheetName);
         protected abstract void ExportLanguageData(DataTable dt, string excelName, string sheetName);
-        protected abstract void CreateDataHelperScript();
+        protected abstract void CreateConfigDataSheetScript();
 
         protected string m_ExportPath = string.Empty;
 
         protected List<string> m_DataTableNameList = null;
         protected List<string> m_ExcelList = null;
 
-        private DataTable m_LanguageDataTable = null;
+        private List<DataTable> m_ListLanguageDataTable = null;
+
+        protected const string m_ExportRootPath = "DataExport";
     }
 }

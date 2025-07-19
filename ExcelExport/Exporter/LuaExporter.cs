@@ -62,7 +62,7 @@ namespace ExcelExport.Exporter
         /// <summary>
         /// 创建数据总表
         /// </summary>
-        protected override void CreateDataHelperScript()
+        protected override void CreateConfigDataSheetScript()
         {
 
         }

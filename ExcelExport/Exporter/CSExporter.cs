@@ -11,26 +11,33 @@ namespace ExcelExport.Exporter
 {
     public class CSExporter : BaseExporter
     {
+        class JsonStruct
+        {
+            public string className;
+            public Dictionary<string, string> fields = new Dictionary<string, string>();
+            public List<JsonStruct> jsonStructList;
+        }
+
         protected override void CreateExportPath()
         {
-            if (Directory.Exists(string.Format("{0}/C#/Data", m_ExportPath)))
+            if (Directory.Exists(GetDataExportPath()))
             {
-                Directory.Delete(string.Format("{0}/C#/Data", m_ExportPath), true);
-                Directory.CreateDirectory(string.Format("{0}/C#/Data", m_ExportPath));
+                Directory.Delete(GetDataExportPath(), true);
+                Directory.CreateDirectory(GetDataExportPath());
             }
             else
             {
-                Directory.CreateDirectory(string.Format("{0}/C#/Data", m_ExportPath));
+                Directory.CreateDirectory(GetDataExportPath());
             }
 
-            if (Directory.Exists(string.Format("{0}/C#/Script", m_ExportPath)))
+            if (Directory.Exists(GetScriptsExportPath()))
             {
-                Directory.Delete(string.Format("{0}/C#/Script", m_ExportPath), true);
-                Directory.CreateDirectory(string.Format("{0}/C#/Script", m_ExportPath));
+                Directory.Delete(GetScriptsExportPath(), true);
+                Directory.CreateDirectory(GetScriptsExportPath());
             }
             else
             {
-                Directory.CreateDirectory(string.Format("{0}/C#/Script", m_ExportPath));
+                Directory.CreateDirectory(GetScriptsExportPath());
             }
         }
 
@@ -41,7 +48,7 @@ namespace ExcelExport.Exporter
             //写入文件
             try
             {
-                FileStream fs = new FileStream(string.Format("{0}/C#/Data/{1}ConfigData.bytes", m_ExportPath, dataTableName), FileMode.Create);
+                FileStream fs = new FileStream(GetDataExportPath(GetConfigDataName(dataTableName)), FileMode.Create);
                 fs.Write(buffer, 0, buffer.Length);
                 fs.Close();
             }
@@ -61,7 +68,7 @@ namespace ExcelExport.Exporter
             //写入文件
             try
             {
-                FileStream fs = new FileStream(string.Format("{0}/C#/Data/{1}LanguageData.bytes", m_ExportPath, dataTableName), FileMode.Create);
+                FileStream fs = new FileStream(GetLanguageDataExprotPath(GetLanguageDataName(dataTableName, ".bytes")), FileMode.Create);
                 fs.Write(buffer, 0, buffer.Length);
                 fs.Close();
             }
@@ -255,7 +262,7 @@ namespace ExcelExport.Exporter
             try
             {
 
-                using FileStream fs = new FileStream(string.Format("{0}/C#/Script/{1}ConfigData.cs", m_ExportPath, dataTableName), FileMode.Create);
+                using FileStream fs = new FileStream(GetScriptsExportPath(GetScriptName(dataTableName)), FileMode.Create);
                 using StreamWriter sw = new StreamWriter(fs);
                 sw.Write(sb.ToString());
             }
@@ -269,7 +276,7 @@ namespace ExcelExport.Exporter
         /// <summary>
         /// 创建数据总表
         /// </summary>
-        protected override void CreateDataHelperScript()
+        protected override void CreateConfigDataSheetScript()
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("\r\n");
@@ -284,7 +291,7 @@ namespace ExcelExport.Exporter
             sb.Append("/// <summary>\r\n");
             sb.AppendFormat("///数据总表\r\n");
             sb.Append("/// </summary>\r\n");
-            sb.AppendFormat("public static partial class ConfigDataHelper\r\n");
+            sb.AppendFormat("public static class ConfigDataSheet\r\n");
             sb.Append("{\r\n");
 
             for (int i = 0; i < m_DataTableNameList.Count; i++)
@@ -335,7 +342,7 @@ namespace ExcelExport.Exporter
 
             try
             {
-                using FileStream fs = new FileStream(string.Format("{0}/C#/Script/ConfigDataHelper.cs", m_ExportPath), FileMode.Create);
+                using FileStream fs = new FileStream(GetScriptsExportPath(GetConfigDataSheetName()), FileMode.Create);
                 using StreamWriter sw = new StreamWriter(fs);
                 sw.Write(sb.ToString());
             }
@@ -534,11 +541,30 @@ namespace ExcelExport.Exporter
             };
         }
 
-        class JsonStruct
+        private string GetDataExportPath(string fileName = "")
         {
-            public string className;
-            public Dictionary<string, string> fields = new Dictionary<string, string>();
-            public List<JsonStruct> jsonStructList;
+            return string.Format("{0}/{1}/C#/Datas/{2}", m_ExportPath,m_ExportRootPath, fileName);
         }
+
+        private string GetScriptsExportPath(string fileName = "")
+        {
+            return string.Format("{0}/{1}/C#/Scripts/{2}", m_ExportPath, m_ExportRootPath, fileName);
+        }
+
+        private string GetConfigDataName(string fileName)
+        {
+            return string.Format("{0}ConfigData.bytes", fileName);
+        }
+
+        private string GetScriptName(string fileName)
+        {
+            return string.Format("{0}ConfigData.cs", fileName);
+        }
+
+        private string GetConfigDataSheetName()
+        {
+            return "ConfigDataSheet.cs";
+        }
+
     }
 }
