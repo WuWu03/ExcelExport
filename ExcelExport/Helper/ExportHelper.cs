@@ -1,11 +1,14 @@
 ﻿using ExcelExport.Exporter;
 using System.Collections.Generic;
+using System.IO;
 
 namespace ExcelExport.Helper
 {
     public static class ExportHelper
     {
-        private static BaseExporter CurrExproter
+        public const string ExportRoot = "DataExport";
+
+        public static BaseExporter currExproter
         {
             get
             {
@@ -15,12 +18,8 @@ namespace ExcelExport.Helper
 
         public static void AddExcel(string excelPath)
         {
-            if (s_CanExportList == null)
-            {
-                s_CanExportList = new List<bool>();
-            }
-
-            s_CanExportList.Add(true);
+            s_CanExportExcels ??= new List<bool>();
+            s_CanExportExcels.Add(true);
 
             for (int i = 0; i < m_Exporters.Length; i++)
             {
@@ -30,10 +29,7 @@ namespace ExcelExport.Helper
 
         public static void ResetExcel()
         {
-            if (s_CanExportList != null)
-            {
-                s_CanExportList.Clear();
-            }
+            s_CanExportExcels?.Clear();
 
             for (int i = 0; i < m_Exporters.Length; i++)
             {
@@ -41,25 +37,26 @@ namespace ExcelExport.Helper
             }
         }
 
-        public static void Export(string exportPath)
+        public static void Export(string exportPath, string authorName)
         {
-            CurrExproter.SetExportPath(exportPath);
-            CurrExproter.Export(s_CanExportList);
+            currExproter.SetExportPath(exportPath);
+            currExproter.SetAuthorName(authorName);
+            currExproter.Export(s_CanExportExcels);
         }
 
         public static void SetExcelCanExport(int index, bool value)
         {
-            if (s_CanExportList == null)
+            if (s_CanExportExcels == null)
             {
                 return;
             }
 
-            if (index < 0 || index >= s_CanExportList.Count)
+            if (index < 0 || index >= s_CanExportExcels.Count)
             {
                 return;
             }
 
-            s_CanExportList[index] = value;
+            s_CanExportExcels[index] = value;
         }
 
         public static void SetCurrExporter(int index)
@@ -67,8 +64,18 @@ namespace ExcelExport.Helper
             m_CurrExporterIndex = index;
         }
 
+        public static void VerifyPath(string path)
+        {
+            if (Directory.Exists(path))
+            {
+                Directory.Delete(path, true);
+            }
+
+            Directory.CreateDirectory(path);
+        }
+
         private static int m_CurrExporterIndex = 0;
         private static BaseExporter[] m_Exporters = new BaseExporter[] { new CSExporter(), new LuaExporter()};
-        private static List<bool> s_CanExportList = null;
+        private static List<bool> s_CanExportExcels = null;
     }
 }

@@ -15,63 +15,43 @@ namespace ExcelExport.Exporter
             m_ExportPath = exprotPath;
         }
 
+        public void SetAuthorName(string authorName)
+        {
+            m_AuthorName = authorName;
+        }
+
         public void AddExcel(string excelPath)
         {
-            if (m_ExcelList == null)
-            {
-                m_ExcelList = new List<string>();
-            }
-
-            m_ExcelList.Add(excelPath);
+            m_Excels ??= new List<string>();
+            m_Excels.Add(excelPath);
         }
 
         public void ResetExcel()
         {
-            if (m_ExcelList != null)
-            {
-                m_ExcelList.Clear();
-            }
+            m_Excels?.Clear();
         }
 
         public void Export(List<bool> canExportList)
         {
-            if (m_ExcelList == null || m_ExcelList.Count < 1)
+            if (m_Excels == null || m_Excels.Count < 1)
             {
                 return;
             }
 
-            if (Directory.Exists(GetLanguageDataExprotPath()))
-            {
-                Directory.Delete(GetLanguageDataExprotPath(), true);
-                Directory.CreateDirectory(GetLanguageDataExprotPath());
-            }
-            else
-            {
-                Directory.CreateDirectory(GetLanguageDataExprotPath());
-            }
-
             CreateExportPath();
 
+            m_DataTableNames ??= new List<string>();
+            m_LanguageDataTables ??= new List<DataTable>();
 
-            if (m_DataTableNameList == null)
-            {
-                m_DataTableNameList = new List<string>();
-            }
+            m_DataTableNames.Clear();
+            m_LanguageDataTables.Clear();
 
-            if (m_ListLanguageDataTable == null)
-            {
-                m_ListLanguageDataTable = new List<DataTable>();
-            }
-
-            m_DataTableNameList.Clear();
-            m_ListLanguageDataTable.Clear();
-
-            for (int i = 0; i < m_ExcelList.Count; i++)
+            for (int i = 0; i < m_Excels.Count; i++)
             {
 
                 if (canExportList != null && i < canExportList.Count && canExportList[i])
                 {
-                    BeforeExport(m_ExcelList[i]);
+                    BeforeExport(m_Excels[i]);
                 }
             }
 
@@ -82,7 +62,7 @@ namespace ExcelExport.Exporter
         private void BeforeExport(string filePath)
         {
             DataTable[] dts = ExcelHelper.ExcelToTable(filePath);
-            string allLanguageContent = string.Empty;
+
             if (dts == null || dts.Length < 1)
             {
                 return;
@@ -126,12 +106,12 @@ namespace ExcelExport.Exporter
 
                 if (dt.Rows[3][0].ToString().ToLower().Equals("language"))
                 {
-                    m_ListLanguageDataTable.Add(dt);
+                    m_LanguageDataTables.Add(dt);
                     ExportLanguageData(dt, excelName, sheetName);
                 }
                 else
                 {
-                    m_DataTableNameList.Add(dataTableName);
+                    m_DataTableNames.Add(dataTableName);
                     ExportData(dt, excelName, sheetName);
                 }
             }
@@ -139,7 +119,7 @@ namespace ExcelExport.Exporter
 
         private void ExportLanguageKeys()
         {
-            if (m_ListLanguageDataTable == null)
+            if (m_LanguageDataTables == null)
             {
                 return;
             }
@@ -148,9 +128,9 @@ namespace ExcelExport.Exporter
             StringBuilder allContentSB = new StringBuilder();
 
             bool hasAddAllKeys = false;
-            for (int i = 0; i < m_ListLanguageDataTable.Count; i++)
+            for (int i = 0; i < m_LanguageDataTables.Count; i++)
             {
-                DataTable dt = m_ListLanguageDataTable[i];
+                DataTable dt = m_LanguageDataTables[i];
 
                 for (int j = 4; j < dt.Rows.Count; j++)
                 {
@@ -174,11 +154,11 @@ namespace ExcelExport.Exporter
                 hasAddAllKeys = true;
             }
 
-            allContentSB.Append("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+[]{}|;':\",.<>?/`~");
+            allContentSB.Append("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ`1234567890-=~!@#$%^&*()_+[]\\{}|;':\",./<>?+-*/");
             try
             {
-                ExportLanguageFile(GetLanguageDataExprotPath(GetLanguageKeysName()), allKeysSB.ToString());
-                ExportLanguageFile(GetLanguageDataExprotPath(GetLanguageContentName()), allContentSB.ToString());
+                CreateLanguageKeyFile(allKeysSB.ToString());
+                CreateLanguageContentFile(allContentSB.ToString());
                 allKeysSB.Clear();
                 allContentSB.Clear();
             }
@@ -188,46 +168,21 @@ namespace ExcelExport.Exporter
             }
         }
 
-        private void ExportLanguageFile(string path, string content)
-        {
-            using FileStream fs = new FileStream(path, FileMode.Create);
-            using StreamWriter sw = new StreamWriter(fs);
-            sw.Write(content);
-        }
-
-
-        protected string GetLanguageDataExprotPath(string fileName = "")
-        {
-            return string.Format("{0}/{1}/LanguageDatas/{2}", m_ExportPath, m_ExportRootPath, fileName);
-        }
-
-        protected string GetLanguageDataName(string fileName, string ext)
-        {
-            return string.Format("{0}LanguageData{1}", fileName, ext);
-        }
-
-        private string GetLanguageKeysName()
-        {
-            return "LanguageKeys.txt";
-        }
-
-        private string GetLanguageContentName()
-        {
-            return "LanguageContent.txt";
-        }
-
+        //protected abstract void ExportLanguageFile(string path, string content);
+        //protected abstract string GetLanguageDataExprotPath(string fileName = "");
+        //protected abstract string GetLanguageDataName(string fileName, string ext);
         protected abstract void CreateExportPath();
         protected abstract void ExportData(DataTable dt, string excelName, string sheetName);
         protected abstract void ExportLanguageData(DataTable dt, string excelName, string sheetName);
         protected abstract void CreateConfigDataSheetScript();
+        protected abstract void CreateLanguageKeyFile(string content);
+        protected abstract void CreateLanguageContentFile(string content);
 
         protected string m_ExportPath = string.Empty;
+        protected string m_AuthorName = string.Empty;
+        protected List<string> m_DataTableNames = null;
+        protected List<string> m_Excels = null;
 
-        protected List<string> m_DataTableNameList = null;
-        protected List<string> m_ExcelList = null;
-
-        private List<DataTable> m_ListLanguageDataTable = null;
-
-        protected const string m_ExportRootPath = "DataExport";
+        private List<DataTable> m_LanguageDataTables = null;
     }
 }

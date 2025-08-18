@@ -15,19 +15,21 @@ namespace ExcelExport
             InitializeComponent();
             ConfigHelper.InitConfig();
 
-            this.codeTypeComboBox.SelectedIndex = 0;
+            codeTypeComboBox.Items.Add("C#");
+            codeTypeComboBox.Items.Add("Lua");
+            codeTypeComboBox.SelectedIndex = 0;
 
             for (int i = 0; i < ConfigHelper.ConfigData.Count; i++)
             {
-                this.configListComboBox.Items.Add(ConfigHelper.ConfigData[i][0]);
+                configListComboBox.Items.Add(ConfigHelper.ConfigData[i][3]);
             }
 
-            this.configListComboBox.Items.Add("添加配置");
-            this.configListComboBox.SelectedIndex = ConfigHelper.CurrSelectIndex;
+            configListComboBox.Items.Add("添加配置");
+            configListComboBox.SelectedIndex = ConfigHelper.CurrSelectIndex;
 
             bool showAddPathBtn = ConfigHelper.ConfigData.Count < 1 || configListComboBox.SelectedIndex == ConfigHelper.ConfigData.Count;
-            this.btnModifyPathConfig.Visible = !showAddPathBtn;
-            this.btnAddPathConfig.Visible = showAddPathBtn;
+            btnModifyPathConfig.Visible = !showAddPathBtn;
+            btnAddPathConfig.Visible = showAddPathBtn;
         }
 
 
@@ -43,7 +45,7 @@ namespace ExcelExport
 
             if (configData != null)
             {
-                excelPath = configData[1];
+                excelPath = configData[0];
             }
 
             if (!string.IsNullOrEmpty(excelPath) && Directory.Exists(excelPath))
@@ -68,25 +70,26 @@ namespace ExcelExport
         private void OnBtnCreateClick(object sender, EventArgs e)
         {
             string exportPath = string.Empty;
+            string authorName = string.Empty;
             string[] configData = ConfigHelper.GetCurrConfig();
 
             if (configData != null)
             {
-                exportPath = configData[2];
+                exportPath = configData[1];
+                authorName = configData[2];
             }
 
             if (!string.IsNullOrEmpty(exportPath) && Directory.Exists(exportPath))
             {
-                ExportExcel(exportPath);
+                ExportExcel(exportPath, authorName);
                 return;
             }
 
-            using (FolderBrowserDialog fbDlg = new FolderBrowserDialog())
+            using FolderBrowserDialog fbDlg = new FolderBrowserDialog();
+
+            if (fbDlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                if (fbDlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    ExportExcel(fbDlg.SelectedPath);
-                }
+                ExportExcel(fbDlg.SelectedPath, authorName);
             }
         }
 
@@ -97,12 +100,11 @@ namespace ExcelExport
         /// <param name="e"></param>
         private void OnBtnSelectExcelClick(object sender, EventArgs e)
         {
-            using (FolderBrowserDialog fbDlg = new FolderBrowserDialog())
+            using FolderBrowserDialog fbDlg = new FolderBrowserDialog();
+
+            if (fbDlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                if (fbDlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    textBoxExcel.Text = fbDlg.SelectedPath;
-                }
+                textBoxExcel.Text = fbDlg.SelectedPath;
             }
         }
 
@@ -113,12 +115,11 @@ namespace ExcelExport
         /// <param name="e"></param>
         private void OnBtnSelectExportClick(object sender, EventArgs e)
         {
-            using (FolderBrowserDialog fbDlg = new FolderBrowserDialog())
+            using FolderBrowserDialog fbDlg = new FolderBrowserDialog();
+
+            if (fbDlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                if (fbDlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    textBoxExport.Text = fbDlg.SelectedPath;
-                }
+                textBoxExport.Text = fbDlg.SelectedPath;
             }
         }
 
@@ -129,8 +130,8 @@ namespace ExcelExport
         /// <param name="e"></param>
         private void OnBtnModifyPathConfigClick(object sender, EventArgs e)
         {
-            ConfigHelper.ModifyPahtConfig(textBoxPathName.Text, textBoxExcel.Text, textBoxExport.Text);
-            configListComboBox.Items[configListComboBox.SelectedIndex] = ConfigHelper.GetCurrConfig()[0];
+            ConfigHelper.ModifyPahtConfig(textBoxExcel.Text, textBoxExport.Text, textBoxAuthorName.Text, textBoxConfigName.Text);
+            configListComboBox.Items[configListComboBox.SelectedIndex] = ConfigHelper.GetCurrConfig()[3];
             MessageBox.Show(this, "修改成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
@@ -141,17 +142,22 @@ namespace ExcelExport
         /// <param name="e"></param>
         private void OnBtnAddPathConfigClick(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(textBoxPathName.Text))
+            if (string.IsNullOrEmpty(textBoxConfigName.Text))
             {
                 MessageBox.Show(this, "名称不能为空", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            configListComboBox.Items[configListComboBox.Items.Count - 1] = textBoxPathName.Text;
+            string excelPath = textBoxExcel.Text;
+            string exportPath = textBoxExport.Text;
+            string authorName = textBoxAuthorName.Text;
+            string configName = textBoxConfigName.Text;
+
+            configListComboBox.Items[configListComboBox.Items.Count - 1] = configName;
             configListComboBox.Items.Add("添加配置");
 
             ConfigHelper.CurrSelectIndex = configListComboBox.Items.Count - 2;
-            ConfigHelper.AddPathConfig(textBoxPathName.Text, textBoxExcel.Text, textBoxExport.Text);
+            ConfigHelper.AddPathConfig(excelPath, exportPath, authorName, configName);
 
             configListComboBox.SelectedIndex = ConfigHelper.CurrSelectIndex;
             OnConfigListComboBoxChanged(configListComboBox, null);
@@ -177,7 +183,7 @@ namespace ExcelExport
                     selectedIndex = 0;
                 }
 
-                textBoxPathName.Text = string.Empty;
+                textBoxConfigName.Text = string.Empty;
                 ConfigHelper.DeletePathConfig();
                 configListComboBox.SelectedIndex = selectedIndex;
 
@@ -196,31 +202,46 @@ namespace ExcelExport
 
             string[] files = Directory.GetFiles(path + "\\", "*", SearchOption.AllDirectories);
 
-            foreach (string strName in files)
+            if (files != null && files.Length > 0)
             {
-                if (!Path.GetExtension(strName).Contains("xls") || strName.Contains("$"))//非excel文件或excel的缓存文件不进行读取
+                foreach (string strName in files)
                 {
-                    continue;
+                    if (!Path.GetExtension(strName).Contains("xls") || strName.Contains("$"))//非excel文件或excel的缓存文件不进行读取
+                    {
+                        continue;
+                    }
+
+                    ExportHelper.AddExcel(strName);
+                    excelList.Items.Add(strName);
+                    excelList.SetItemChecked(excelList.Items.Count - 1, true);
                 }
 
-                ExportHelper.AddExcel(strName);
-                excelList.Items.Add(strName);
-                excelList.SetItemChecked(excelList.Items.Count - 1, true);
+                MessageBox.Show(this, "读取成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-
-            MessageBox.Show(this, "读取成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            else
+            {
+                MessageBox.Show(this, "读取失败，该路径下不存在Excel文件", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         /// <summary>
         /// 导出excel
         /// </summary>
         /// <param name="path"></param>
-        private void ExportExcel(string path)
+        private void ExportExcel(string path, string authorName)
         {
-            ExportHelper.Export(path);
-            MessageBox.Show(this, "创建成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (excelList.Items != null && excelList.Items.Count > 0)
+            {
+                string exportPath = (!path.EndsWith("\\DataExport\\")) ? string.Format("{0}\\DataExport\\", path) : path;
+                ExportHelper.Export(exportPath, authorName);
+                MessageBox.Show(this, "创建成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-            System.Diagnostics.Process.Start("explorer.exe", path + @"\");
+                System.Diagnostics.Process.Start("explorer.exe", exportPath);
+            }
+            else
+            {
+                MessageBox.Show(this, "文件列表为空，无法导出", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         /// <summary>
@@ -298,7 +319,6 @@ namespace ExcelExport
         private void OnTextBoxExportDragDrop(object sender, DragEventArgs e)
         {
             string exportPath = ((System.Array)e.Data.GetData(DataFormats.FileDrop)).GetValue(0).ToString();
-
             textBoxExport.Text = exportPath;
         }
 
@@ -318,15 +338,17 @@ namespace ExcelExport
             {
                 textBoxExcel.Text = string.Empty;
                 textBoxExport.Text = string.Empty;
-                textBoxPathName.Text = string.Empty;
+                textBoxAuthorName.Text = string.Empty;
+                textBoxConfigName.Text = string.Empty;
             }
             else
             {
                 ConfigHelper.CurrSelectIndex = configListComboBox.SelectedIndex;
                 string[] config = ConfigHelper.GetCurrConfig();
-                textBoxPathName.Text = config[0];
-                textBoxExcel.Text = config[1];
-                textBoxExport.Text = config[2];
+                textBoxExcel.Text = config[0];
+                textBoxExport.Text = config[1];
+                textBoxAuthorName.Text = config[2];
+                textBoxConfigName.Text = config[3];
             }
         }
 

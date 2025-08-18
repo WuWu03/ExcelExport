@@ -1,8 +1,11 @@
-﻿using ExcelExport.LitJson;
+﻿using ExcelExport.Helper;
+using ExcelExport.LitJson;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Text;
+using System.Windows.Forms;
 
 namespace ExcelExport.Exporter
 {
@@ -10,15 +13,8 @@ namespace ExcelExport.Exporter
     {
         protected override void CreateExportPath()
         {
-            if (Directory.Exists(string.Format("{0}/Lua", m_ExportPath)))
-            {
-                Directory.Delete(string.Format("{0}/Lua", m_ExportPath), true);
-                Directory.CreateDirectory(string.Format("{0}/Lua", m_ExportPath));
-            }
-            else
-            {
-                Directory.CreateDirectory(string.Format("{0}/Lua", m_ExportPath));
-            }
+            ExportHelper.VerifyPath(GetDataExportPath());
+            ExportHelper.VerifyPath(GetLanguageDataExprotPath());
         }
 
         /// <summary>
@@ -26,13 +22,17 @@ namespace ExcelExport.Exporter
         /// </summary>
         protected override void ExportData(DataTable dt, string excelName, string sheetName)
         {
+            string dataTableName = dt.Rows[1][0].ToString();
             StringBuilder sb = new StringBuilder();
-            sb.Append("local data = {\n");
+            sb.AppendFormat("--excelName = {0}\r\n", excelName);
+            sb.AppendFormat("--sheetName = {0}\r\n", sheetName);
+            sb.Append("\r\n");
+            sb.Append("local data = {\r\n");
 
             for (int i = 4; i < dt.Rows.Count; i++)
             {
                 sb.AppendFormat("\t[{0}] = ", i - 3);
-                sb.Append("{\n");
+                sb.Append("{\r\n");
 
                 for (int j = 1; j < dt.Columns.Count; j++)
                 {
@@ -44,19 +44,17 @@ namespace ExcelExport.Exporter
 
                     if (!string.IsNullOrEmpty(fieldStr))
                     {
-                        sb.AppendFormat("\t\t{0}\n", fieldStr);
+                        sb.AppendFormat("\t\t{0}\r\n", fieldStr);
                     }
                 }
 
-                sb.Append("\t},\n");
+                sb.Append("\t},\r\n");
             }
 
-            sb.Append("}\n");
-            sb.AppendFormat("--excelName = {0}\n", excelName);
-            sb.AppendFormat("--sheetName = {0}\n", sheetName);
+            sb.Append("}\r\n");
             sb.Append("return data");
 
-            File.WriteAllText(string.Format("{0}/Lua/{1}Data.lua", m_ExportPath, dt.Rows[1][0].ToString()), sb.ToString());
+            File.WriteAllText(GetDataExportPath(GetConfigDataName(dataTableName)), sb.ToString());
         }
 
         /// <summary>
@@ -64,7 +62,73 @@ namespace ExcelExport.Exporter
         /// </summary>
         protected override void CreateConfigDataSheetScript()
         {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("//--[[\r\n");
+            sb.Append("数据总表\r\n");
+            if (!string.IsNullOrEmpty(m_AuthorName))
+            {
+                sb.AppendFormat("作者：{0}", m_AuthorName);
+                sb.Append("\r\n");
+            }
+            sb.AppendFormat("创建时间：{0}\r\n", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            sb.Append("备注：此代码为工具生成 请勿手工修改\r\n");
+            sb.Append("]]\r\n");
+            sb.Append("\r\nConfigDataSheet = {}\r\n");
+            sb.AppendFormat("function ConfigDataSheet:Init(filePath)\r\n");
 
+            for (int i = 0; i < m_DataTableNames.Count; i++)
+            {
+                if (!string.IsNullOrEmpty(m_DataTableNames[i]))
+                {
+                    sb.AppendFormat("\t\tself.{0}ConfigData = require(string.format(%s/%s,filePath,\"{0}ConfigData\"))\r\n", m_DataTableNames[i]);
+                }
+            }
+
+            sb.Append("end");
+            sb.Append('}');
+
+            try
+            {
+                File.WriteAllText(GetDataExportPath("ConfigDataSheet.lua"), sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+            sb.Clear();
+        }
+
+        protected override void ExportLanguageData(DataTable dt, string excelName, string sheetName)
+        {
+            string dataTableName = dt.Rows[1][0].ToString();
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat("--excelName = {0}\r\n", excelName);
+            sb.AppendFormat("--sheetName = {0}\r\n", sheetName);
+            sb.Append("\r\nlocal data = {\r\n");
+
+            for (int i = 4; i < dt.Rows.Count; i++)
+            {
+                string key = dt.Rows[i][2].ToString().Trim();
+                string content = dt.Rows[i][3].ToString().Trim();
+
+                sb.AppendFormat("\t[\"{0}\"] = \"{1}\"\r\n", key, content);
+            }
+
+            sb.Append("}\r\n");
+            sb.Append("return data");
+
+            File.WriteAllText(GetLanguageDataExprotPath(GetLanguageDataName(dataTableName)), sb.ToString());
+        }
+
+        protected override void CreateLanguageKeyFile(string content)
+        {
+            File.WriteAllText(GetLanguageDataExprotPath("LanguageKeys.txt"), content);
+        }
+
+        protected override void CreateLanguageContentFile(string content)
+        {
+            File.WriteAllText(GetLanguageDataExprotPath("LanguageContent.txt"), content);
         }
 
         private string GetFieldStr(string fieldName, string fieldValue, string fieldType)
@@ -224,16 +288,31 @@ namespace ExcelExport.Exporter
 
             for (int i = 0; i < tCount; i++)
             {
-                sb.Append("\t");
+                sb.Append('\t');
             }
 
             sb.AppendFormat("{0}\n", GetFieldStr(fieldName, fieldValueStr, fieldType));
             return true;
         }
 
-        protected override void ExportLanguageData(DataTable dt, string excelName, string sheetName)
+        private string GetDataExportPath(string fileName = "")
         {
-            throw new System.NotImplementedException();
+            return string.Format("{0}Lua\\Datas\\{1}", m_ExportPath, fileName);
+        }
+
+        private string GetConfigDataName(string fileName)
+        {
+            return string.Format("{0}ConfigData.lua", fileName);
+        }
+
+        private string GetLanguageDataExprotPath(string fileName = "")
+        {
+            return string.Format("{0}Lua\\LanguageDatas\\{1}", m_ExportPath, fileName);
+        }
+
+        private string GetLanguageDataName(string fileName)
+        {
+            return string.Format("{0}LanguageData.lua", fileName);
         }
     }
 }

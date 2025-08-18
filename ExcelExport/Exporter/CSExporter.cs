@@ -15,36 +15,20 @@ namespace ExcelExport.Exporter
         {
             public string className;
             public Dictionary<string, string> fields = new Dictionary<string, string>();
-            public List<JsonStruct> jsonStructList;
+            public List<JsonStruct> children;
         }
 
         protected override void CreateExportPath()
         {
-            if (Directory.Exists(GetDataExportPath()))
-            {
-                Directory.Delete(GetDataExportPath(), true);
-                Directory.CreateDirectory(GetDataExportPath());
-            }
-            else
-            {
-                Directory.CreateDirectory(GetDataExportPath());
-            }
-
-            if (Directory.Exists(GetScriptsExportPath()))
-            {
-                Directory.Delete(GetScriptsExportPath(), true);
-                Directory.CreateDirectory(GetScriptsExportPath());
-            }
-            else
-            {
-                Directory.CreateDirectory(GetScriptsExportPath());
-            }
+            ExportHelper.VerifyPath(GetDataExportPath());
+            ExportHelper.VerifyPath(GetScriptsExportPath());
+            ExportHelper.VerifyPath(GetLanguageDataExprotPath());
         }
 
         protected override void ExportData(DataTable dt, string excelName, string sheetName)
         {
             string dataTableName = dt.Rows[1][0].ToString();
-            byte[] buffer = GetDataBuffer(dt, excelName, sheetName);
+            byte[] buffer = GetDataBuffer(dt);
             //写入文件
             try
             {
@@ -63,14 +47,12 @@ namespace ExcelExport.Exporter
         protected override void ExportLanguageData(DataTable dt, string excelName, string sheetName)
         {
             string dataTableName = dt.Rows[1][0].ToString();
-            byte[] buffer = GetDataBuffer(dt, excelName, sheetName);
+            byte[] buffer = GetDataBuffer(dt);
 
             //写入文件
             try
             {
-                FileStream fs = new FileStream(GetLanguageDataExprotPath(GetLanguageDataName(dataTableName, ".bytes")), FileMode.Create);
-                fs.Write(buffer, 0, buffer.Length);
-                fs.Close();
+                File.WriteAllBytes(GetLanguageDataExprotPath(GetLanguageDataName(dataTableName)), buffer);
             }
             catch (Exception ex)
             {
@@ -78,34 +60,14 @@ namespace ExcelExport.Exporter
             }
         }
 
-        private byte[] GetDataBuffer(DataTable dt, string excelName, string sheetName)
+        protected override void CreateLanguageKeyFile(string content)
         {
-            byte[] buffer = null;
+            File.WriteAllText(GetLanguageDataExprotPath("LanguageKeys.txt"), content);
+        }
 
-            using (MemoryStreamEx mse = new MemoryStreamEx())
-            {
-                mse.WriteInt(dt.Rows.Count - 3);
-                mse.WriteInt(dt.Columns.Count - 1);
-
-                for (int i = 1; i < dt.Columns.Count; i++)
-                {
-                    mse.WriteUTF8String(dt.Rows[0][i].ToString().Trim());
-                }
-
-                for (int i = 4; i < dt.Rows.Count; i++)
-                {
-                    for (int j = 1; j < dt.Columns.Count; j++)
-                    {
-                        mse.WriteUTF8String(dt.Rows[i][j].ToString().Trim());
-                    }
-                }
-
-                buffer = mse.ToArray();
-            }
-
-            //压缩
-            buffer = ZlibHelper.CompressBytes(buffer);
-            return buffer;
+        protected override void CreateLanguageContentFile(string content)
+        {
+            File.WriteAllText(GetLanguageDataExprotPath("LanguageContent.txt"), content);
         }
 
         /// <summary>
@@ -125,9 +87,14 @@ namespace ExcelExport.Exporter
             }
 
             StringBuilder sb = new StringBuilder();
-            sb.Append("\r\n");
             sb.Append("//===================================================\r\n");
-            sb.Append("//作者：WuWu                                          \r\n");
+
+            if (!string.IsNullOrEmpty(m_AuthorName))
+            {
+                sb.AppendFormat("//作者：{0}", m_AuthorName);
+                sb.Append("\r\n");
+            }
+
             sb.AppendFormat("//创建时间：{0}\r\n", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             sb.Append("//备注：此代码为工具生成 请勿手工修改\r\n");
             sb.Append("//===================================================\r\n");
@@ -255,22 +222,16 @@ namespace ExcelExport.Exporter
             }
 
             sb.Append("\t}\r\n");
-            sb.Append("}\r\n");
+            sb.Append('}');
 
-            //写入文件
-
-            try
+            try//写入文件
             {
-
-                using FileStream fs = new FileStream(GetScriptsExportPath(GetScriptName(dataTableName)), FileMode.Create);
-                using StreamWriter sw = new StreamWriter(fs);
-                sw.Write(sb.ToString());
+                File.WriteAllText(GetScriptsExportPath(GetScriptName(dataTableName)), sb.ToString());
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
-
         }
 
         /// <summary>
@@ -279,9 +240,12 @@ namespace ExcelExport.Exporter
         protected override void CreateConfigDataSheetScript()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("\r\n");
             sb.Append("//===================================================\r\n");
-            sb.Append("//作者：GQY                                          \r\n");
+            if (!string.IsNullOrEmpty(m_AuthorName))
+            {
+                sb.AppendFormat("//作者：{0}", m_AuthorName);
+                sb.Append("\r\n");
+            }
             sb.AppendFormat("//创建时间：{0}\r\n", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             sb.Append("//备注：此代码为工具生成 请勿手工修改\r\n");
             sb.Append("//===================================================\r\n");
@@ -289,17 +253,17 @@ namespace ExcelExport.Exporter
             sb.Append("using GameFrameWork.ConfigData;\r\n");
             sb.Append("\r\n");
             sb.Append("/// <summary>\r\n");
-            sb.AppendFormat("///数据总表\r\n");
+            sb.Append("///数据总表\r\n");
             sb.Append("/// </summary>\r\n");
             sb.AppendFormat("public static class ConfigDataSheet\r\n");
             sb.Append("{\r\n");
 
-            for (int i = 0; i < m_DataTableNameList.Count; i++)
+            for (int i = 0; i < m_DataTableNames.Count; i++)
             {
-                if (!string.IsNullOrEmpty(m_DataTableNameList[i]))
+                if (!string.IsNullOrEmpty(m_DataTableNames[i]))
                 {
-                    string fieldName = string.Concat(m_DataTableNameList[i][..1].ToLower(), m_DataTableNameList[i].AsSpan(1));
-                    sb.AppendFormat("\tpublic static {0}ConfigData[] {1}ConfigDatas = null;", m_DataTableNameList[i], fieldName);
+                    string fieldName = string.Concat(m_DataTableNames[i][..1].ToLower(), m_DataTableNames[i].AsSpan(1));
+                    sb.AppendFormat("\tpublic static {0}ConfigData[] {1}ConfigDatas = null;", m_DataTableNames[i], fieldName);
                     sb.Append("\r\n");
                 }
             }
@@ -308,43 +272,21 @@ namespace ExcelExport.Exporter
             sb.Append("\tpublic static void Init(string filePath)\r\n");
             sb.Append("\t{\r\n");
 
-            for (int i = 0; i < m_DataTableNameList.Count; i++)
+            for (int i = 0; i < m_DataTableNames.Count; i++)
             {
-                if (!string.IsNullOrEmpty(m_DataTableNameList[i]))
+                if (!string.IsNullOrEmpty(m_DataTableNames[i]))
                 {
-                    string fieldName = string.Concat(m_DataTableNameList[i][..1].ToLower(), m_DataTableNameList[i].AsSpan(1));
-                    sb.AppendFormat("\t\t{0}ConfigDatas = LoadConfigData<{1}ConfigData>(filePath, \"{2}ConfigData\");\r\n", fieldName, m_DataTableNameList[i], m_DataTableNameList[i]);
+                    string fieldName = string.Concat(m_DataTableNames[i][..1].ToLower(), m_DataTableNames[i].AsSpan(1));
+                    sb.AppendFormat("\t\t{0}ConfigDatas = LoadConfigData<{1}ConfigData>(filePath, \"{2}ConfigData\");\r\n", fieldName, m_DataTableNames[i], m_DataTableNames[i]);
                 }
             }
 
             sb.Append("\t}\r\n");
-
-            //sb.Append("\tpublic static T[] LoadData<T>(string filePath, string fileName) where T : BaseLocalData, new()\r\n");
-            //sb.Append("\t{\r\n");
-            //sb.Append("\t\tstring path = string.Format(filePath + \"/{0}\", fileName);\r\n");
-            //sb.Append("\t\tT[] t = null;\r\n");
-            //sb.Append("\t\tusing (LocalDataParser parser = new LocalDataParser(path))\r\n");
-            //sb.Append("\t\t{\r\n");
-            //sb.Append("\t\t\tt = new T[parser.row - 1];\r\n");
-            //sb.Append("\t\t\tint index = 0;\r\n");
-            //sb.Append("\t\t\twhile (!parser.eof)\r\n");
-            //sb.Append("\t\t\t{\r\n");
-            //sb.Append("\t\t\t\tt[index] = new T();\r\n");
-            //sb.Append("\t\t\t\tt[index].Read(parser);\r\n");
-            //sb.Append("\t\t\t\tparser.Next();\r\n");
-            //sb.Append("\t\t\t\tindex++;\r\n");
-            //sb.Append("\t\t\t}\r\n");
-            //sb.Append("\t\t}\r\n");
-            //sb.Append("\t\treturn t;\r\n");
-            //sb.Append("\t}\r\n");
-
-            sb.Append("}\r\n");
+            sb.Append('}');
 
             try
             {
-                using FileStream fs = new FileStream(GetScriptsExportPath(GetConfigDataSheetName()), FileMode.Create);
-                using StreamWriter sw = new StreamWriter(fs);
-                sw.Write(sb.ToString());
+                File.WriteAllText(GetScriptsExportPath("ConfigDataSheet.cs"), sb.ToString());
             }
             catch (Exception ex)
             {
@@ -352,6 +294,36 @@ namespace ExcelExport.Exporter
             }
 
             sb.Clear();
+        }
+
+        private byte[] GetDataBuffer(DataTable dt)
+        {
+            byte[] buffer = null;
+
+            using (MemoryStreamEx mse = new MemoryStreamEx())
+            {
+                mse.WriteInt(dt.Rows.Count - 3);
+                mse.WriteInt(dt.Columns.Count - 1);
+
+                for (int i = 1; i < dt.Columns.Count; i++)
+                {
+                    mse.WriteUTF8String(dt.Rows[0][i].ToString().Trim());
+                }
+
+                for (int i = 4; i < dt.Rows.Count; i++)
+                {
+                    for (int j = 1; j < dt.Columns.Count; j++)
+                    {
+                        mse.WriteUTF8String(dt.Rows[i][j].ToString().Trim());
+                    }
+                }
+
+                buffer = mse.ToArray();
+            }
+
+            //压缩
+            buffer = ZlibHelper.CompressBytes(buffer);
+            return buffer;
         }
 
         private void ParseJson(LitJson.JsonData jsonData, JsonStruct jsonStruct)
@@ -376,15 +348,15 @@ namespace ExcelExport.Exporter
                     {
                         fieldType = string.Concat(key[..1].ToUpper(), key.AsSpan(1));
 
-                        jsonStruct.jsonStructList ??= new List<JsonStruct>();
+                        jsonStruct.children ??= new List<JsonStruct>();
 
                         JsonStruct childJsonStruct = null;
 
-                        for (int i = 0; i < jsonStruct.jsonStructList.Count; i++)
+                        for (int i = 0; i < jsonStruct.children.Count; i++)
                         {
-                            if (jsonStruct.jsonStructList[i].className.Equals(fieldType))
+                            if (jsonStruct.children[i].className.Equals(fieldType))
                             {
-                                childJsonStruct = jsonStruct.jsonStructList[i];
+                                childJsonStruct = jsonStruct.children[i];
                                 break;
                             }
                         }
@@ -395,7 +367,7 @@ namespace ExcelExport.Exporter
                             {
                                 className = fieldType
                             };
-                            jsonStruct.jsonStructList.Add(childJsonStruct);
+                            jsonStruct.children.Add(childJsonStruct);
                         }
 
                         if (!jsonStruct.fields.ContainsKey(fieldName))
@@ -467,11 +439,11 @@ namespace ExcelExport.Exporter
 
             sb.Append("{\r\n");
 
-            if (jsonStruct.jsonStructList != null && jsonStruct.jsonStructList.Count > 0)
+            if (jsonStruct.children != null && jsonStruct.children.Count > 0)
             {
-                for (int i = 0; i < jsonStruct.jsonStructList.Count; i++)
+                for (int i = 0; i < jsonStruct.children.Count; i++)
                 {
-                    CreateJsonCode(jsonStruct.jsonStructList[i], sb, tCount + 1);
+                    CreateJsonCode(jsonStruct.children[i], sb, tCount + 1);
                 }
 
                 sb.Append("\r\n");
@@ -543,12 +515,12 @@ namespace ExcelExport.Exporter
 
         private string GetDataExportPath(string fileName = "")
         {
-            return string.Format("{0}/{1}/C#/Datas/{2}", m_ExportPath,m_ExportRootPath, fileName);
+            return string.Format("{0}C#\\Datas\\{1}", m_ExportPath, fileName);
         }
 
         private string GetScriptsExportPath(string fileName = "")
         {
-            return string.Format("{0}/{1}/C#/Scripts/{2}", m_ExportPath, m_ExportRootPath, fileName);
+            return string.Format("{0}C#\\Scripts\\{1}", m_ExportPath, fileName);
         }
 
         private string GetConfigDataName(string fileName)
@@ -561,10 +533,14 @@ namespace ExcelExport.Exporter
             return string.Format("{0}ConfigData.cs", fileName);
         }
 
-        private string GetConfigDataSheetName()
+        private string GetLanguageDataExprotPath(string fileName = "")
         {
-            return "ConfigDataSheet.cs";
+            return string.Format("{0}C#\\LanguageDatas\\{1}", m_ExportPath, fileName);
         }
 
+        private string GetLanguageDataName(string fileName)
+        {
+            return string.Format("{0}LanguageData.bytes", fileName);
+        }
     }
 }

@@ -22,7 +22,7 @@ namespace ExcelExport.Helper
         {
             get
             {
-                return s_ConfigData;
+                return s_ConfigDatas;
             }
         }
 
@@ -34,12 +34,13 @@ namespace ExcelExport.Helper
             {
                 for (int i = 0; i < xmlNode.ChildNodes[1].ChildNodes[0].ChildNodes.Count; i++)
                 {
-                    string[] config = new string[3];
+                    string[] config = new string[4];
                     config[0] = xmlNode.ChildNodes[1].ChildNodes[0].ChildNodes[i].ChildNodes[0].InnerText;
                     config[1] = xmlNode.ChildNodes[1].ChildNodes[0].ChildNodes[i].ChildNodes[1].InnerText;
                     config[2] = xmlNode.ChildNodes[1].ChildNodes[0].ChildNodes[i].ChildNodes[2].InnerText;
+                    config[3] = xmlNode.ChildNodes[1].ChildNodes[0].ChildNodes[i].ChildNodes[3].InnerText;
 
-                    s_ConfigData.Add(config);
+                    s_ConfigDatas.Add(config);
                 }
             }
 
@@ -55,38 +56,41 @@ namespace ExcelExport.Helper
 
         public static string[] GetCurrConfig()
         {
-            if (s_ConfigData == null || s_ConfigData.Count < 1)
+            if (s_ConfigDatas == null || s_ConfigDatas.Count < 1)
             {
                 return null;
             }
 
-            if (s_CurrSelectIndex < 0 || s_CurrSelectIndex >= s_ConfigData.Count)
+            if (s_CurrSelectIndex < 0 || s_CurrSelectIndex >= s_ConfigDatas.Count)
             {
                 return null;
             }
 
-            return s_ConfigData[s_CurrSelectIndex]; ;
+            return s_ConfigDatas[s_CurrSelectIndex]; ;
         }
 
-        public static void AddPathConfig(string configName, string excelPath, string exportPath)
+        public static void AddPathConfig(string excelPath, string exportPath, string authorName, string configName)
         {
-            s_ConfigData.Add(new string[3] { configName, excelPath, exportPath });
-            s_CurrSelectIndex = s_ConfigData.Count - 1;
+            s_ConfigDatas.Add(new string[4] { excelPath, exportPath, authorName, configName });
+            s_CurrSelectIndex = s_ConfigDatas.Count - 1;
 
             XmlDocument doc = GetXmlDocument();
 
             XmlNode pathNode = doc.CreateNode(XmlNodeType.Element, "Path", null);
-            XmlNode nameNode = doc.CreateNode(XmlNodeType.Element, "Name", null);
-            XmlNode excelNode = doc.CreateNode(XmlNodeType.Element, "ExcelPath", null);
-            XmlNode exportNode = doc.CreateNode(XmlNodeType.Element, "ExportPath", null);
+            XmlNode excelPathNode = doc.CreateNode(XmlNodeType.Element, "ExcelPath", null);
+            XmlNode exportPathNode = doc.CreateNode(XmlNodeType.Element, "ExportPath", null);
+            XmlNode autherNameNode = doc.CreateNode(XmlNodeType.Element, "AuthorName", null);
+            XmlNode configNameNode = doc.CreateNode(XmlNodeType.Element, "ConfigName", null);
 
-            nameNode.InnerText = configName;
-            excelNode.InnerText = excelPath;
-            exportNode.InnerText = exportPath;
+            excelPathNode.InnerText = excelPath;
+            exportPathNode.InnerText = exportPath;
+            autherNameNode.InnerText = authorName;
+            configNameNode.InnerText = configName;
 
-            pathNode.AppendChild(nameNode);
-            pathNode.AppendChild(excelNode);
-            pathNode.AppendChild(exportNode);
+            pathNode.AppendChild(excelPathNode);
+            pathNode.AppendChild(exportPathNode);
+            pathNode.AppendChild(autherNameNode);
+            pathNode.AppendChild(configNameNode);
             doc.ChildNodes[1].ChildNodes[0].AppendChild(pathNode);
 
             SetXmlNode(doc);
@@ -98,7 +102,7 @@ namespace ExcelExport.Helper
             XmlNode currNode = doc.ChildNodes[1].ChildNodes[0].ChildNodes[s_CurrSelectIndex];
             doc.ChildNodes[1].ChildNodes[0].RemoveChild(currNode);
 
-            s_ConfigData.RemoveAt(s_CurrSelectIndex);
+            s_ConfigDatas.RemoveAt(s_CurrSelectIndex);
             s_CurrSelectIndex--;
 
             if (s_CurrSelectIndex < 0)
@@ -109,25 +113,27 @@ namespace ExcelExport.Helper
             SetXmlNode(doc);
         }
 
-        public static void ModifyPahtConfig(string configName, string excelPath, string exportPath)
+        public static void ModifyPahtConfig(string excelPath, string exportPath, string authorName, string configName)
         {
-            s_ConfigData[s_CurrSelectIndex][0] = configName;
-            s_ConfigData[s_CurrSelectIndex][1] = excelPath;
-            s_ConfigData[s_CurrSelectIndex][2] = exportPath;
+            s_ConfigDatas[s_CurrSelectIndex][0] = excelPath;
+            s_ConfigDatas[s_CurrSelectIndex][1] = exportPath;
+            s_ConfigDatas[s_CurrSelectIndex][2] = authorName;
+            s_ConfigDatas[s_CurrSelectIndex][3] = configName;
 
             XmlDocument doc = GetXmlDocument();
 
             XmlNode currNode = doc.ChildNodes[1].ChildNodes[0].ChildNodes[s_CurrSelectIndex];
-            currNode.ChildNodes[0].InnerText = configName;
-            currNode.ChildNodes[1].InnerText = excelPath;
-            currNode.ChildNodes[2].InnerText = exportPath;
 
+            currNode.ChildNodes[0].InnerText = excelPath;
+            currNode.ChildNodes[1].InnerText = exportPath;
+            currNode.ChildNodes[2].InnerText = authorName;
+            currNode.ChildNodes[3].InnerText = configName;
             SetXmlNode(doc);
         }
 
         private static void SetXmlNode(XmlDocument doc)
         {
-            XmlNode indexNode = null;
+            XmlNode indexNode;
 
             if (doc.ChildNodes[1].ChildNodes.Count < 2)
             {
@@ -165,7 +171,7 @@ namespace ExcelExport.Helper
             return doc;
         }
 
-        private static List<string[]> s_ConfigData = new List<string[]>();
+        private static List<string[]> s_ConfigDatas = new List<string[]>();
         private static int s_CurrSelectIndex = -1;
     }
 }
