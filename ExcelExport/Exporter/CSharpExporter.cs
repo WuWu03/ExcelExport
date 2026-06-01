@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace ExcelExport.Exporter
 {
-    public class CSExporter : BaseExporter
+    public class CSharpExporter : BaseExporter
     {
         class JsonStruct
         {
@@ -87,28 +87,20 @@ namespace ExcelExport.Exporter
             }
 
             StringBuilder sb = new StringBuilder();
-            sb.Append("//===================================================\r\n");
-
-            if (!string.IsNullOrEmpty(m_AuthorName))
-            {
-                sb.AppendFormat("//作者：{0}", m_AuthorName);
-                sb.Append("\r\n");
-            }
-
-            sb.AppendFormat("//创建时间：{0}\r\n", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-            sb.Append("//备注：此代码为工具生成 请勿手工修改\r\n");
-            sb.Append("//===================================================\r\n");
-            sb.Append("using GameFrameWork;\r\n");
-            sb.Append("using GameFrameWork.ConfigData;\r\n");
+            sb.AppendLine("/*");
+            sb.AppendFormat(" * @Desc: {0} 数据表，SheetName: {1}\r\n", excelName, sheetName);
+            sb.AppendFormat(" * @Date: {0}\r\n", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            sb.AppendLine(" * @Author: " + m_AuthorName);
+            sb.AppendLine(" * @Note: 工具生成，请勿修改");
+            sb.AppendLine(" */");
+            sb.AppendLine();
+            sb.Append("using WuWuFramework;\r\n");
+            sb.Append("using WuWuFramework.ConfigData;\r\n");
             sb.Append("using LitJson;\r\n");
             sb.Append("using System;\r\n");
             sb.Append("using System.Collections;\r\n");
             sb.Append("using UnityEngine;\r\n");
             sb.Append("\r\n");
-            sb.Append("/// <summary>\r\n");
-            sb.AppendFormat("/// {0}数据表\r\n", excelName);
-            sb.AppendFormat("/// SheetName:{0}\r\n", sheetName);
-            sb.Append("/// </summary>\r\n");
             sb.AppendFormat("public class {0}ConfigData : BaseConfigData\r\n", dataTableName);
             sb.Append("{\r\n");
 
@@ -239,61 +231,56 @@ namespace ExcelExport.Exporter
         /// </summary>
         protected override void CreateConfigDataSheetScript()
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append("//===================================================\r\n");
-            if (!string.IsNullOrEmpty(m_AuthorName))
-            {
-                sb.AppendFormat("//作者：{0}", m_AuthorName);
-                sb.Append("\r\n");
-            }
-            sb.AppendFormat("//创建时间：{0}\r\n", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-            sb.Append("//备注：此代码为工具生成 请勿手工修改\r\n");
-            sb.Append("//===================================================\r\n");
-            sb.Append("using System.Collections;\r\n");
-            sb.Append("using GameFrameWork.ConfigData;\r\n");
-            sb.Append("\r\n");
-            sb.Append("/// <summary>\r\n");
-            sb.Append("///数据总表\r\n");
-            sb.Append("/// </summary>\r\n");
-            sb.AppendFormat("public static class ConfigDataSheet\r\n");
-            sb.Append("{\r\n");
+            //StringBuilder sb = new StringBuilder();
+            //sb.AppendLine("/*");
+            //sb.AppendLine(" * @Desc: 数据实体类定义");
+            //sb.AppendFormat(" * @Date: {0}\r\n", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            //sb.AppendLine(" * @Author: " + m_AuthorName);
+            //sb.AppendLine(" * @Note: 工具生成，请勿修改");
+            //sb.AppendLine(" */");
+            //sb.AppendLine();
+            //sb.Append("using System.Collections;\r\n");
+            //sb.Append("using WuWuFramework.ConfigData;\r\n");
+            //sb.Append("\r\n");
+            //sb.AppendFormat("public static class ConfigDataSheet\r\n");
+            //sb.Append("{\r\n");
 
-            for (int i = 0; i < m_DataTableNames.Count; i++)
-            {
-                if (!string.IsNullOrEmpty(m_DataTableNames[i]))
-                {
-                    string fieldName = string.Concat(m_DataTableNames[i][..1].ToLower(), m_DataTableNames[i].AsSpan(1));
-                    sb.AppendFormat("\tpublic static {0}ConfigData[] {1}ConfigDatas = null;", m_DataTableNames[i], fieldName);
-                    sb.Append("\r\n");
-                }
-            }
+            //for (int i = 0; i < m_DataTableNames.Count; i++)
+            //{
+            //    if (!string.IsNullOrEmpty(m_DataTableNames[i]))
+            //    {
+            //        string fieldName = string.Concat(m_DataTableNames[i][..1].ToLower(), m_DataTableNames[i].AsSpan(1));
+            //        sb.AppendFormat("\tpublic static {0}ConfigData[] {1}ConfigDatas = null;", m_DataTableNames[i], fieldName);
+            //        sb.Append("\r\n");
+            //    }
+            //}
 
-            sb.Append("\r\n");
-            sb.Append("\tpublic static void Init(string filePath)\r\n");
-            sb.Append("\t{\r\n");
+            //sb.Append("\r\n");
+            //sb.Append("\tpublic static void Init(string filePath)\r\n");
+            //sb.Append("\t{\r\n");
 
-            for (int i = 0; i < m_DataTableNames.Count; i++)
-            {
-                if (!string.IsNullOrEmpty(m_DataTableNames[i]))
-                {
-                    string fieldName = string.Concat(m_DataTableNames[i][..1].ToLower(), m_DataTableNames[i].AsSpan(1));
-                    sb.AppendFormat("\t\t{0}ConfigDatas = LoadConfigData<{1}ConfigData>(filePath, \"{2}ConfigData\");\r\n", fieldName, m_DataTableNames[i], m_DataTableNames[i]);
-                }
-            }
+            //for (int i = 0; i < m_DataTableNames.Count; i++)
+            //{
+            //    if (!string.IsNullOrEmpty(m_DataTableNames[i]))
+            //    {
+            //        string fieldName = string.Concat(m_DataTableNames[i][..1].ToLower(), m_DataTableNames[i].AsSpan(1));
+            //        sb.AppendFormat("\t\t{0}ConfigDatas = LoadConfigData<{1}ConfigData>(filePath, \"{2}ConfigData\");\r\n", fieldName, m_DataTableNames[i], m_DataTableNames[i]);
+            //    }
+            //}
 
-            sb.Append("\t}\r\n");
-            sb.Append('}');
+            //sb.Append("\t}\r\n");
+            //sb.Append('}');
 
-            try
-            {
-                File.WriteAllText(GetScriptsExportPath("ConfigDataSheet.cs"), sb.ToString());
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            //try
+            //{
+            //    File.WriteAllText(GetScriptsExportPath("ConfigDataSheet.cs"), sb.ToString());
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show(ex.Message);
+            //}
 
-            sb.Clear();
+            //sb.Clear();
         }
 
         private byte[] GetDataBuffer(DataTable dt)
