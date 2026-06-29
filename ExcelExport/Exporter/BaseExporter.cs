@@ -1,4 +1,5 @@
 ﻿using ExcelExport.Helper;
+using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -51,7 +52,7 @@ namespace ExcelExport.Exporter
 
                 if (canExportList != null && i < canExportList.Count && canExportList[i])
                 {
-                    BeforeExport(m_Excels[i]);
+                    Export(m_Excels[i]);
                 }
             }
 
@@ -59,7 +60,7 @@ namespace ExcelExport.Exporter
             ExportLanguageKeys();
         }
 
-        private void BeforeExport(string filePath)
+        private void Export(string filePath)
         {
             DataTable[] dts = ExcelHelper.ExcelToTable(filePath);
 
@@ -94,7 +95,9 @@ namespace ExcelExport.Exporter
                 //每列的第三行如果填入BAN则此列不导出(第一列为id，强制导出)
                 for (int col = dt.Columns.Count - 1; col > 0; col--)
                 {
-                    if (col > 1 && dt.Rows[3][col].ToString().ToLower().Equals("ban"))
+                    bool isColNull = dt.Rows[0][col] == null || string.IsNullOrEmpty(dt.Rows[0][col].ToString());
+
+                    if (col > 1 && (dt.Rows[3][col].ToString().ToLower().Equals("ban") || isColNull))
                     {
                         dt.Columns.RemoveAt(col);
                     }
