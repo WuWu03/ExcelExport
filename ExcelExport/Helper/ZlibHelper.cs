@@ -20,27 +20,22 @@ namespace ExcelExport.Helper
         {
             if (OrgByte == null) return null;
 
-            using (MemoryStream OrgStream = new MemoryStream(OrgByte))
-            {
-                using (MemoryStream CompressedStream = new MemoryStream())
-                {
-                    using (ZOutputStream outZStream = new ZOutputStream(CompressedStream, CompressRate))
-                    {
-                        try
-                        {
-                            CopyStream(OrgStream, outZStream);
-                            outZStream.finish();//重要！否则结果数据不完整！
-                                                //程序执行到这里，CompressedStream就是压缩后的数据
-                            if (CompressedStream == null) return null;
+            using MemoryStream OrgStream = new(OrgByte);
+            using MemoryStream CompressedStream = new();
+            using ZOutputStream outZStream = new(CompressedStream, CompressRate);
 
-                            return CompressedStream.ToArray();
-                        }
-                        catch
-                        {
-                            return null;
-                        }
-                    }
-                }
+            try
+            {
+                CopyStream(OrgStream, outZStream);
+                outZStream.finish();//重要！否则结果数据不完整！
+                                    //程序执行到这里，CompressedStream就是压缩后的数据
+                if (CompressedStream == null) return null;
+
+                return CompressedStream.ToArray();
+            }
+            catch
+            {
+                return null;
             }
         }
         #endregion
@@ -55,33 +50,28 @@ namespace ExcelExport.Helper
         {
             if (CompressedBytes == null) return null;
 
-            using (MemoryStream CompressedStream = new MemoryStream(CompressedBytes))
-            {
-                using (MemoryStream OrgStream = new MemoryStream())
-                {
-                    using (ZOutputStream outZStream = new ZOutputStream(OrgStream))
-                    {
-                        try
-                        {
-                            //-----------------------
-                            //解压缩
-                            //-----------------------
-                            CopyStream(CompressedStream, outZStream);
-                            outZStream.finish();//重要！
-                                                //程序执行到这里，OrgStream就是解压缩后的数据
+            using MemoryStream CompressedStream = new(CompressedBytes);
+            using MemoryStream OrgStream = new();
+            using ZOutputStream outZStream = new(OrgStream);
 
-                            if (OrgStream == null)
-                            {
-                                return null;
-                            }
-                            return OrgStream.ToArray();
-                        }
-                        catch
-                        {
-                            return null;
-                        }
-                    }
+            try
+            {
+                //-----------------------
+                //解压缩
+                //-----------------------
+                CopyStream(CompressedStream, outZStream);
+                outZStream.finish();//重要！
+                                    //程序执行到这里，OrgStream就是解压缩后的数据
+
+                if (OrgStream == null)
+                {
+                    return null;
                 }
+                return OrgStream.ToArray();
+            }
+            catch
+            {
+                return null;
             }
         }
         #endregion
@@ -135,7 +125,7 @@ namespace ExcelExport.Helper
         /// </summary>
         /// <param name="input"></param>
         /// <param name="output"></param>
-        private static void CopyStream(Stream input, Stream output)
+        private static void CopyStream(MemoryStream input, ZOutputStream output)
         {
             byte[] buffer = new byte[2000];
             int len;

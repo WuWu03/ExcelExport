@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.3.32819.101
+# Visual Studio Version 18
+VisualStudioVersion = 18.6.11822.322 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelExport", "ExcelExport\ExcelExport.csproj", "{BF2A9CC0-D7A7-429F-BD1F-DDBDBF0FF858}"
 EndProject

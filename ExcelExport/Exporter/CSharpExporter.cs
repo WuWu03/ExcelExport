@@ -11,12 +11,52 @@ namespace ExcelExport.Exporter
 {
     public class CSharpExporter : BaseExporter
     {
+        enum FieldType : byte
+        {
+            Byte,
+            Short,
+            Int,
+            Long,
+            Float,
+            Double,
+            Bool,
+            String,
+            Vector2,
+            Vector3,
+            Json,
+            ByteArray,
+            ShortArray,
+            IntArray,
+            LongArray,
+            FloatArray,
+            DoubleArray,
+            BoolArray,
+            UTF8StringArray,
+            Vector2Array,
+            Vector3Array,
+            JsonArray,
+            Dictionary,
+        }
+
         class JsonStruct
         {
             public string className;
-            public Dictionary<string, string> fields = new Dictionary<string, string>();
+            public Dictionary<string, string> fields = new();
             public List<JsonStruct> children;
         }
+
+        public override string exporterName => "C#";
+
+        private readonly List<string> m_NameSpaces = new()
+        {
+            "using LitJson;\r\n",
+            "using System;\r\n",
+            "using System.Collections;\r\n",
+            "using System.Collections.Generic;\r\n",
+            "using UnityEngine;\r\n",
+            "using WuWuFramework;\r\n",
+            "using WuWuFramework.ConfigData;\r\n",
+        };
 
         protected override void CreateExportPath()
         {
@@ -32,7 +72,7 @@ namespace ExcelExport.Exporter
             //写入文件
             try
             {
-                FileStream fs = new FileStream(GetDataExportPath(GetConfigDataName(dataTableName)), FileMode.Create);
+                FileStream fs = new(GetDataExportPath(GetConfigDataName(dataTableName)), FileMode.Create);
                 fs.Write(buffer, 0, buffer.Length);
                 fs.Close();
             }
@@ -86,26 +126,27 @@ namespace ExcelExport.Exporter
                 }
             }
 
-            StringBuilder sb = new StringBuilder();
+            m_NameSpaces.Sort();
+            StringBuilder sb = new();
             sb.AppendLine("/*");
             sb.AppendFormat(" * @Desc: {0} 数据表，SheetName: {1}\r\n", excelName, sheetName);
             sb.AppendFormat(" * @Date: {0}\r\n", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-            sb.AppendLine(" * @Author: " + m_AuthorName);
+            sb.AppendLine(" * @Author: " + authorName);
             sb.AppendLine(" * @Note: 工具生成，请勿修改");
             sb.AppendLine(" */");
             sb.AppendLine();
-            sb.Append("using WuWuFramework;\r\n");
-            sb.Append("using WuWuFramework.ConfigData;\r\n");
-            sb.Append("using LitJson;\r\n");
-            sb.Append("using System;\r\n");
-            sb.Append("using System.Collections;\r\n");
-            sb.Append("using UnityEngine;\r\n");
+
+            foreach (string nameSpace in m_NameSpaces)
+            {
+                sb.Append(nameSpace);
+            }
+
             sb.Append("\r\n");
             sb.AppendFormat("public class {0}ConfigData : BaseConfigData\r\n", dataTableName);
             sb.Append("{\r\n");
 
             //生成Json实体类代码
-            Dictionary<string, string> jsonDic = new Dictionary<string, string>();
+            Dictionary<string, string> jsonDic = new();
 
             for (int i = 1; i < dataArr.GetLength(0); i++)
             {
@@ -131,7 +172,7 @@ namespace ExcelExport.Exporter
             foreach (KeyValuePair<string, string> kvp in jsonDic)
             {
                 JsonData obj = JsonMapper.ToObject(kvp.Value);
-                JsonStruct jsonStruct = new JsonStruct
+                JsonStruct jsonStruct = new()
                 {
                     className = kvp.Key
                 };
@@ -169,19 +210,20 @@ namespace ExcelExport.Exporter
 
             //生成克隆代码
 
-            string variableName = string.Concat(dataTableName[..1].ToLower(), dataTableName.AsSpan(1));
-
+            string cloneObjName = string.Concat(dataTableName[..1].ToLower(), dataTableName.AsSpan(1));
             sb.AppendFormat("\tpublic {0}ConfigData Clone()\r\n", dataTableName);
             sb.Append("\t{\r\n");
-            sb.AppendFormat("\t\t{0}ConfigData {1}ConfigData = new {2}ConfigData();\r\n", dataTableName, variableName, dataTableName);
+            sb.AppendFormat("\t\t{0}ConfigData {1}ConfigData = new();\r\n", dataTableName, cloneObjName);
+            sb.Append("\t\t{\r\n");
 
             for (int i = 1; i < dataArr.GetLength(0); i++)
             {
-                sb.AppendFormat("\t\t{0}ConfigData.{1} = this.{2};", variableName, dataArr[i, 0], dataArr[i, 0]);
+                sb.AppendFormat("\t\t\t{0} = this.{1};", dataArr[i, 0], dataArr[i, 0]);
                 sb.Append("\r\n");
             }
 
-            sb.AppendFormat("\t\treturn {0}ConfigData;\r\n", variableName);
+            sb.AppendLine("\t\t}\r\n");
+            sb.AppendFormat("\t\treturn {0}ConfigData;\r\n", cloneObjName);
             sb.Append("\t}\r\n");
             sb.Append("\r\n");
 
@@ -203,16 +245,20 @@ namespace ExcelExport.Exporter
                 if (fieldType == FieldType.Json)
                 {
                     string typeName = string.Concat(dataArr[i, 0][..1].ToUpper(), dataArr[i, 0].AsSpan(1));
-                    sb.AppendFormat("\t\tthis.{0} = JsonMapper.ToObject<{1}>(parser{2});\r\n", fieldName, typeName, GetTypeParseStr(FieldType.UTF8String));
+                    sb.AppendFormat("\t\t{0} = JsonMapper.ToObject<{1}>(parser{2});\r\n", fieldName, typeName, GetTypeParseStr(FieldType.String));
                 }
                 else if (fieldType == FieldType.JsonArray)
                 {
                     string typeName = string.Concat(dataArr[i, 0][..1].ToUpper(), dataArr[i, 0].AsSpan(1));
-                    sb.AppendFormat("\t\tthis.{0} = JsonMapper.ToObject<{1}[]>(parser{2});\r\n", fieldName, typeName, GetTypeParseStr(FieldType.UTF8String));
+                    sb.AppendFormat("\t\t{0} = JsonMapper.ToObject<{1}[]>(parser{2});\r\n", fieldName, typeName, GetTypeParseStr(FieldType.String));
+                }
+                else if (fieldType == FieldType.Dictionary)
+                {
+                    sb.AppendFormat("\t\t{0} = parser{1};\r\n", fieldName, string.Format(GetTypeParseStr(fieldType), typeNames[1], typeNames[2]));
                 }
                 else
                 {
-                    sb.AppendFormat("\t\tthis.{0} = parser{1};\r\n", fieldName, GetTypeParseStr(fieldType));
+                    sb.AppendFormat("\t\t{0} = parser{1};\r\n", fieldName, GetTypeParseStr(fieldType));
                 }
             }
 
@@ -230,46 +276,41 @@ namespace ExcelExport.Exporter
         }
 
 
-
         private byte[] GetDataBuffer(DataTable dt)
         {
-            byte[] buffer = null;
+            byte[] buffer;
+            using MemoryStreamEx mse = new();
+            mse.WriteInt(dt.Rows.Count - 3);//写入行数
+            mse.WriteInt(dt.Columns.Count - 1);//写入列数
 
-            using (MemoryStreamEx mse = new MemoryStreamEx())
+            for (int i = 4; i < dt.Rows.Count; i++)
             {
-                mse.WriteInt(dt.Rows.Count - 3);//写入行数
-                mse.WriteInt(dt.Columns.Count - 1);//写入列数
-
-                for (int i = 4; i < dt.Rows.Count; i++)
+                for (int j = 1; j < dt.Columns.Count; j++)
                 {
-                    for (int j = 1; j < dt.Columns.Count; j++)
+                    string typeName = dt.Rows[1][j].ToString();
+                    FieldType fieldType = GetFieldType(typeName);
+                    bool fieldNull = dt.Rows[i][j] == null || dt.Rows[i][j] == DBNull.Value || string.IsNullOrEmpty(dt.Rows[i][j].ToString());
+                    string fieldStr = dt.Rows[i][j].ToString().Trim();
+
+                    try
                     {
-                        string typeName = dt.Rows[1][j].ToString();
-                        FieldType fieldType = GetFieldType(typeName);
-                        bool fieldNull = dt.Rows[i][j] == null || dt.Rows[i][j] == DBNull.Value || string.IsNullOrEmpty(dt.Rows[i][j].ToString());
-                        string fieldStr = dt.Rows[i][j].ToString().Trim();
-
-                        try
+                        if (fieldType == FieldType.Dictionary)
                         {
-                            if (fieldType == FieldType.Dictionary)
-                            {
-                                WriteDictionary(typeName, fieldNull, fieldStr, mse, dt.TableName, i, j);
-                            }
-                            else
-                            {
-                                WriteButter(fieldType, fieldNull, fieldStr, mse, dt.TableName, i, j);
-                            }
+                            WriteDictionary(typeName, fieldNull, fieldStr, mse, dt.TableName, i, j);
                         }
-                        catch
+                        else
                         {
-
+                            WriteButter(fieldType, fieldNull, fieldStr, mse, dt.TableName, i, j);
                         }
                     }
-                }
+                    catch
+                    {
 
-                buffer = mse.ToArray();
+                    }
+                }
             }
 
+            buffer = mse.ToArray();
             buffer = ZlibHelper.CompressBytes(buffer);//压缩
             return buffer;
         }
@@ -367,7 +408,7 @@ namespace ExcelExport.Exporter
                     }
 
                     break;
-                case FieldType.UTF8String:
+                case FieldType.String:
                     mse.WriteUTF8String(fieldStr);
                     break;
                 case FieldType.Vector2:
@@ -742,34 +783,7 @@ namespace ExcelExport.Exporter
                 sb.Append('\t');
             }
 
-            sb.Append("}\r\n");
-        }
-
-        enum FieldType : byte
-        {
-            Byte,
-            Short,
-            Int,
-            Long,
-            Float,
-            Double,
-            Bool,
-            UTF8String,
-            Vector2,
-            Vector3,
-            Json,
-            ByteArray,
-            ShortArray,
-            IntArray,
-            LongArray,
-            FloatArray,
-            DoubleArray,
-            BoolArray,
-            UTF8StringArray,
-            Vector2Array,
-            Vector3Array,
-            JsonArray,
-            Dictionary,
+            sb.AppendLine("}\r\n");
         }
 
         private string[] GetTypeName(string typeName)
@@ -830,7 +844,7 @@ namespace ExcelExport.Exporter
                 "float" => FieldType.Float,
                 "double" => FieldType.Double,
                 "bool" => FieldType.Bool,
-                "string" => FieldType.UTF8String,
+                "string" => FieldType.String,
                 "Vector2" => FieldType.Vector2,
                 "Vector3" => FieldType.Vector3,
                 "byte[]" => FieldType.ByteArray,
@@ -854,39 +868,39 @@ namespace ExcelExport.Exporter
         {
             return fieldType switch
             {
-                FieldType.Byte => ".ReadByte()",
-                FieldType.Short => ".ReadShort()",
-                FieldType.Int => ".ReadInt()",
-                FieldType.Long => ".ReadLong()",
-                FieldType.Float => ".ReadFloat()",
-                FieldType.Double => ".ReadDouble()",
-                FieldType.Bool => ".ReadBool()",
-                FieldType.UTF8String => ".ReadUTF8String()",
-                FieldType.Vector2 => ".ReadVector2()",
-                FieldType.Vector3 => ".ReadVector3()",
-                FieldType.ByteArray => ".ReadByteArray()",
-                FieldType.ShortArray => ".ReadShortArray()",
-                FieldType.IntArray => ".ReadIntArray()",
-                FieldType.LongArray => ".ReadLongArray()",
-                FieldType.FloatArray => ".ReadFloatArray()",
-                FieldType.DoubleArray => ".ReadDoubleArray()",
-                FieldType.BoolArray => ".ReadBoolArray()",
-                FieldType.UTF8StringArray => ".ReadUTF8StringArray()",
-                FieldType.Vector2Array => ".ReadVector2Array()",
-                FieldType.Vector3Array => ".ReadVector3Array()",
-                FieldType.Dictionary => ".ReadDictionary()",
+                FieldType.Byte => ".Read<byte>()",
+                FieldType.Short => ".Read<short>()",
+                FieldType.Int => ".Read<int>()",
+                FieldType.Long => ".Read<long>()",
+                FieldType.Float => ".Read<float>()",
+                FieldType.Double => ".Read<double>()",
+                FieldType.Bool => ".Read<bool>()",
+                FieldType.String => ".Read<string>()",
+                FieldType.Vector2 => ".Read<Vector2>()",
+                FieldType.Vector3 => ".Read<Vector3>()",
+                FieldType.ByteArray => ".Read<byte[]>()",
+                FieldType.ShortArray => ".Read<short[]>()",
+                FieldType.IntArray => ".Read<int[]>()",
+                FieldType.LongArray => ".Read<long[]>()",
+                FieldType.FloatArray => ".Read<float[]>()",
+                FieldType.DoubleArray => ".Read<double[]>()",
+                FieldType.BoolArray => ".Read<bool[]>()",
+                FieldType.UTF8StringArray => ".Read<string[]>()",
+                FieldType.Vector2Array => ".Read<Vector2[]>()",
+                FieldType.Vector3Array => ".Read<Vector3[]>()",
+                FieldType.Dictionary => ".ReadDictionary<{0}, {1}>()",
                 _ => throw new NotImplementedException(),
             };
         }
 
         private string GetDataExportPath(string fileName = "")
         {
-            return string.Format("{0}C#\\Datas\\{1}", m_ExportPath, fileName);
+            return string.Format("{0}C#\\Datas\\{1}", exportPath, fileName);
         }
 
         private string GetScriptsExportPath(string fileName = "")
         {
-            return string.Format("{0}C#\\Scripts\\{1}", m_ExportPath, fileName);
+            return string.Format("{0}C#\\Scripts\\{1}", exportPath, fileName);
         }
 
         private string GetConfigDataName(string fileName)
@@ -901,7 +915,7 @@ namespace ExcelExport.Exporter
 
         private string GetLanguageDataExprotPath(string fileName = "")
         {
-            return string.Format("{0}C#\\LanguageDatas\\{1}", m_ExportPath, fileName);
+            return string.Format("{0}C#\\LanguageDatas\\{1}", exportPath, fileName);
         }
 
         private string GetLanguageDataName(string fileName)

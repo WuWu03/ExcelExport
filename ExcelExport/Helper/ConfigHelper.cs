@@ -6,7 +6,7 @@ namespace ExcelExport.Helper
 {
     public static class ConfigHelper
     {
-        public static int CurrSelectIndex
+        public static int currSelectIndex
         {
             get
             {
@@ -18,7 +18,7 @@ namespace ExcelExport.Helper
             }
         }
 
-        public static List<string[]> ConfigData
+        public static List<string[]> configData
         {
             get
             {
@@ -28,7 +28,7 @@ namespace ExcelExport.Helper
 
         public static void InitConfig()
         {
-            XmlNode xmlNode = GetXmlDocument();
+            XmlDocument xmlNode = GetXmlDocument();
 
             if (xmlNode.ChildNodes[1].ChildNodes.Count > 0)
             {
@@ -151,7 +151,7 @@ namespace ExcelExport.Helper
 
         private static XmlDocument GetXmlDocument()
         {
-            XmlDocument doc = new XmlDocument();
+            XmlDocument doc = new();
 
             if (File.Exists("PathConfig.xml"))
             {
@@ -171,7 +171,7 @@ namespace ExcelExport.Helper
             return doc;
         }
 
-        private static List<string[]> s_ConfigDatas = new List<string[]>();
+        private static readonly List<string[]> s_ConfigDatas = new();
         private static int s_CurrSelectIndex = -1;
     }
 }

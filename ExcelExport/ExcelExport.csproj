@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net9.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>9.0</LangVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>C:\Users\42421\Desktop\excel\</PublishUrl>
     <Install>true</Install>

@@ -1,5 +1,4 @@
 ﻿using ExcelExport.Helper;
-using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,48 +10,56 @@ namespace ExcelExport.Exporter
 {
     public abstract class BaseExporter
     {
+        private List<DataTable> m_LanguageDataTables = null;
+        protected string exportPath { get; private set; }
+        protected string authorName { get; private set; }
+        protected List<string> dataTableNames { get; private set; }
+        protected List<string> excels { get; private set; }
+
+        public abstract string exporterName { get; }
+
         public void SetExportPath(string exprotPath)
         {
-            m_ExportPath = exprotPath;
+            exportPath = exprotPath;
         }
 
         public void SetAuthorName(string authorName)
         {
-            m_AuthorName = authorName;
+            this.authorName = authorName;
         }
 
         public void AddExcel(string excelPath)
         {
-            m_Excels ??= new List<string>();
-            m_Excels.Add(excelPath);
+            excels ??= new List<string>();
+            excels.Add(excelPath);
         }
 
         public void ResetExcel()
         {
-            m_Excels?.Clear();
+            excels?.Clear();
         }
 
         public void Export(List<bool> canExportList)
         {
-            if (m_Excels == null || m_Excels.Count < 1)
+            if (excels == null || excels.Count < 1)
             {
                 return;
             }
 
             CreateExportPath();
 
-            m_DataTableNames ??= new List<string>();
+            dataTableNames ??= new List<string>();
             m_LanguageDataTables ??= new List<DataTable>();
 
-            m_DataTableNames.Clear();
+            dataTableNames.Clear();
             m_LanguageDataTables.Clear();
 
-            for (int i = 0; i < m_Excels.Count; i++)
+            for (int i = 0; i < excels.Count; i++)
             {
 
                 if (canExportList != null && i < canExportList.Count && canExportList[i])
                 {
-                    Export(m_Excels[i]);
+                    Export(excels[i]);
                 }
             }
 
@@ -114,7 +121,7 @@ namespace ExcelExport.Exporter
                 }
                 else
                 {
-                    m_DataTableNames.Add(dataTableName);
+                    dataTableNames.Add(dataTableName);
                     ExportData(dt, excelName, sheetName);
                 }
             }
@@ -127,8 +134,8 @@ namespace ExcelExport.Exporter
                 return;
             }
 
-            StringBuilder allKeysSB = new StringBuilder();
-            StringBuilder allContentSB = new StringBuilder();
+            StringBuilder allKeysSB = new();
+            StringBuilder allContentSB = new();
 
             bool hasAddAllKeys = false;
             for (int i = 0; i < m_LanguageDataTables.Count; i++)
@@ -180,12 +187,5 @@ namespace ExcelExport.Exporter
         protected abstract void CreateConfigDataSheetScript();
         protected abstract void CreateLanguageKeyFile(string content);
         protected abstract void CreateLanguageContentFile(string content);
-
-        protected string m_ExportPath = string.Empty;
-        protected string m_AuthorName = string.Empty;
-        protected List<string> m_DataTableNames = null;
-        protected List<string> m_Excels = null;
-
-        private List<DataTable> m_LanguageDataTables = null;
     }
 }

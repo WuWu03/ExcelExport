@@ -1,4 +1,5 @@
-﻿using ExcelExport.Helper;
+﻿using ExcelExport.Exporter;
+using ExcelExport.Helper;
 using System;
 using System.IO;
 using System.Windows.Forms;
@@ -14,20 +15,25 @@ namespace ExcelExport
         {
             InitializeComponent();
             ConfigHelper.InitConfig();
+            ExportHelper.AddExporter(new CSharpExporter());
+            // ExportHelper.AddExporter(new LuaExporter()));
 
-            codeTypeComboBox.Items.Add("C#");
-            codeTypeComboBox.Items.Add("Lua");
+            for(int i = 0; i < ExportHelper.exporters.Count; i++)
+            {
+                codeTypeComboBox.Items.Add(ExportHelper.exporters[i].exporterName);
+            }
+
             codeTypeComboBox.SelectedIndex = 0;
 
-            for (int i = 0; i < ConfigHelper.ConfigData.Count; i++)
+            for (int i = 0; i < ConfigHelper.configData.Count; i++)
             {
-                configListComboBox.Items.Add(ConfigHelper.ConfigData[i][3]);
+                configListComboBox.Items.Add(ConfigHelper.configData[i][3]);
             }
 
             configListComboBox.Items.Add("添加配置");
-            configListComboBox.SelectedIndex = ConfigHelper.CurrSelectIndex;
+            configListComboBox.SelectedIndex = ConfigHelper.currSelectIndex;
 
-            bool showAddPathBtn = ConfigHelper.ConfigData.Count < 1 || configListComboBox.SelectedIndex == ConfigHelper.ConfigData.Count;
+            bool showAddPathBtn = ConfigHelper.configData.Count < 1 || configListComboBox.SelectedIndex == ConfigHelper.configData.Count;
             btnModifyPathConfig.Visible = !showAddPathBtn;
             btnAddPathConfig.Visible = showAddPathBtn;
         }
@@ -54,7 +60,7 @@ namespace ExcelExport
                 return;
             }
 
-            using FolderBrowserDialog fbDlg = new FolderBrowserDialog();
+            using FolderBrowserDialog fbDlg = new();
 
             if (fbDlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -85,7 +91,7 @@ namespace ExcelExport
                 return;
             }
 
-            using FolderBrowserDialog fbDlg = new FolderBrowserDialog();
+            using FolderBrowserDialog fbDlg = new();
 
             if (fbDlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -100,7 +106,7 @@ namespace ExcelExport
         /// <param name="e"></param>
         private void OnBtnSelectExcelClick(object sender, EventArgs e)
         {
-            using FolderBrowserDialog fbDlg = new FolderBrowserDialog();
+            using FolderBrowserDialog fbDlg = new();
 
             if (fbDlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -115,7 +121,7 @@ namespace ExcelExport
         /// <param name="e"></param>
         private void OnBtnSelectExportClick(object sender, EventArgs e)
         {
-            using FolderBrowserDialog fbDlg = new FolderBrowserDialog();
+            using FolderBrowserDialog fbDlg = new();
 
             if (fbDlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
@@ -153,13 +159,13 @@ namespace ExcelExport
             string authorName = textBoxAuthorName.Text;
             string configName = textBoxConfigName.Text;
 
-            configListComboBox.Items[configListComboBox.Items.Count - 1] = configName;
+            configListComboBox.Items[^1] = configName;
             configListComboBox.Items.Add("添加配置");
 
-            ConfigHelper.CurrSelectIndex = configListComboBox.Items.Count - 2;
+            ConfigHelper.currSelectIndex = configListComboBox.Items.Count - 2;
             ConfigHelper.AddPathConfig(excelPath, exportPath, authorName, configName);
 
-            configListComboBox.SelectedIndex = ConfigHelper.CurrSelectIndex;
+            configListComboBox.SelectedIndex = ConfigHelper.currSelectIndex;
             OnConfigListComboBoxChanged(configListComboBox, null);
 
             MessageBox.Show(this, "添加成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -206,7 +212,7 @@ namespace ExcelExport
             {
                 foreach (string strName in files)
                 {
-                    if (!Path.GetExtension(strName).Contains("xls") || strName.Contains("$"))//非excel文件或excel的缓存文件不进行读取
+                    if (!Path.GetExtension(strName).Contains("xls") || strName.Contains('$'))//非excel文件或excel的缓存文件不进行读取
                     {
                         continue;
                     }
@@ -329,7 +335,7 @@ namespace ExcelExport
         /// <param name="e"></param>
         private void OnConfigListComboBoxChanged(object sender, EventArgs e)
         {
-            bool showAddPathBtn = ConfigHelper.ConfigData.Count < 1 || this.configListComboBox.SelectedIndex == ConfigHelper.ConfigData.Count;
+            bool showAddPathBtn = ConfigHelper.configData.Count < 1 || this.configListComboBox.SelectedIndex == ConfigHelper.configData.Count;
             btnModifyPathConfig.Visible = !showAddPathBtn;
             btnDelectPathConfig.Visible = !showAddPathBtn;
             btnAddPathConfig.Visible = showAddPathBtn;
@@ -343,7 +349,7 @@ namespace ExcelExport
             }
             else
             {
-                ConfigHelper.CurrSelectIndex = configListComboBox.SelectedIndex;
+                ConfigHelper.currSelectIndex = configListComboBox.SelectedIndex;
                 string[] config = ConfigHelper.GetCurrConfig();
                 textBoxExcel.Text = config[0];
                 textBoxExport.Text = config[1];

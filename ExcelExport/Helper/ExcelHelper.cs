@@ -19,7 +19,7 @@ namespace ExcelExport.Helper
             IWorkbook workbook = null;
             string fileExt = Path.GetExtension(file).ToLower();
 
-            using FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+            using FileStream fs = new(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 
             if (fileExt == ".xlsx")
             {
@@ -53,7 +53,7 @@ namespace ExcelExport.Helper
                     continue;
                 }
 
-                List<int> columns = new List<int>();
+                List<int> columns = new();
 
                 for (int j = 0; j < header.LastCellNum; j++)
                 {
