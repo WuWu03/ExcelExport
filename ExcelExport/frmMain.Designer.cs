@@ -39,33 +39,35 @@ namespace ExcelExport
             groupBox1 = new System.Windows.Forms.GroupBox();
             excelList = new System.Windows.Forms.CheckedListBox();
             tabPage2 = new System.Windows.Forms.TabPage();
-            groupBox3 = new System.Windows.Forms.GroupBox();
-            groupBox8 = new System.Windows.Forms.GroupBox();
+            groupBox7 = new System.Windows.Forms.GroupBox();
+            groupBox5 = new System.Windows.Forms.GroupBox();
             textBoxAuthorName = new System.Windows.Forms.TextBox();
             groupBox6 = new System.Windows.Forms.GroupBox();
             btnDelectPathConfig = new System.Windows.Forms.Button();
             btnModifyPathConfig = new System.Windows.Forms.Button();
             btnAddPathConfig = new System.Windows.Forms.Button();
             textBoxConfigName = new System.Windows.Forms.TextBox();
-            groupBox5 = new System.Windows.Forms.GroupBox();
+            groupBox9 = new System.Windows.Forms.GroupBox();
             btnSelectExport = new System.Windows.Forms.Button();
             textBoxExport = new System.Windows.Forms.TextBox();
-            groupBox4 = new System.Windows.Forms.GroupBox();
+            groupBox8 = new System.Windows.Forms.GroupBox();
             btnSelectExcel = new System.Windows.Forms.Button();
             textBoxExcel = new System.Windows.Forms.TextBox();
-            groupBox7 = new System.Windows.Forms.GroupBox();
+            groupBox3 = new System.Windows.Forms.GroupBox();
             configListComboBox = new System.Windows.Forms.ComboBox();
+            groupBox4 = new System.Windows.Forms.GroupBox();
             groupBox2.SuspendLayout();
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             groupBox1.SuspendLayout();
             tabPage2.SuspendLayout();
-            groupBox3.SuspendLayout();
-            groupBox8.SuspendLayout();
-            groupBox6.SuspendLayout();
-            groupBox5.SuspendLayout();
-            groupBox4.SuspendLayout();
             groupBox7.SuspendLayout();
+            groupBox5.SuspendLayout();
+            groupBox6.SuspendLayout();
+            groupBox9.SuspendLayout();
+            groupBox8.SuspendLayout();
+            groupBox3.SuspendLayout();
+            groupBox4.SuspendLayout();
             SuspendLayout();
             // 
             // btnCreate
@@ -166,8 +168,9 @@ namespace ExcelExport
             // tabPage2
             // 
             tabPage2.AutoScroll = true;
-            tabPage2.Controls.Add(groupBox3);
+            tabPage2.Controls.Add(groupBox4);
             tabPage2.Controls.Add(groupBox7);
+            tabPage2.Controls.Add(groupBox3);
             tabPage2.Location = new System.Drawing.Point(4, 26);
             tabPage2.Margin = new System.Windows.Forms.Padding(4);
             tabPage2.Name = "tabPage2";
@@ -177,33 +180,31 @@ namespace ExcelExport
             tabPage2.Text = "路径配置";
             tabPage2.UseVisualStyleBackColor = true;
             // 
-            // groupBox3
+            // groupBox7
             // 
-            groupBox3.BackColor = System.Drawing.Color.Transparent;
-            groupBox3.Controls.Add(groupBox8);
-            groupBox3.Controls.Add(groupBox6);
-            groupBox3.Controls.Add(groupBox5);
-            groupBox3.Controls.Add(groupBox4);
-            groupBox3.Location = new System.Drawing.Point(7, 95);
-            groupBox3.Margin = new System.Windows.Forms.Padding(4);
-            groupBox3.Name = "groupBox3";
-            groupBox3.Padding = new System.Windows.Forms.Padding(4);
-            groupBox3.Size = new System.Drawing.Size(789, 372);
-            groupBox3.TabIndex = 5;
-            groupBox3.TabStop = false;
-            groupBox3.Text = "路径配置";
+            groupBox7.BackColor = System.Drawing.Color.Transparent;
+            groupBox7.Controls.Add(groupBox9);
+            groupBox7.Controls.Add(groupBox8);
+            groupBox7.Location = new System.Drawing.Point(8, 321);
+            groupBox7.Margin = new System.Windows.Forms.Padding(4);
+            groupBox7.Name = "groupBox7";
+            groupBox7.Padding = new System.Windows.Forms.Padding(4);
+            groupBox7.Size = new System.Drawing.Size(789, 193);
+            groupBox7.TabIndex = 5;
+            groupBox7.TabStop = false;
+            groupBox7.Text = "路径配置";
             // 
-            // groupBox8
+            // groupBox5
             // 
-            groupBox8.Controls.Add(textBoxAuthorName);
-            groupBox8.Location = new System.Drawing.Point(6, 176);
-            groupBox8.Margin = new System.Windows.Forms.Padding(4);
-            groupBox8.Name = "groupBox8";
-            groupBox8.Padding = new System.Windows.Forms.Padding(4);
-            groupBox8.Size = new System.Drawing.Size(775, 66);
-            groupBox8.TabIndex = 5;
-            groupBox8.TabStop = false;
-            groupBox8.Text = "作者信息";
+            groupBox5.Controls.Add(textBoxAuthorName);
+            groupBox5.Location = new System.Drawing.Point(7, 23);
+            groupBox5.Margin = new System.Windows.Forms.Padding(4);
+            groupBox5.Name = "groupBox5";
+            groupBox5.Padding = new System.Windows.Forms.Padding(4);
+            groupBox5.Size = new System.Drawing.Size(774, 66);
+            groupBox5.TabIndex = 5;
+            groupBox5.TabStop = false;
+            groupBox5.Text = "作者信息";
             // 
             // textBoxAuthorName
             // 
@@ -220,11 +221,11 @@ namespace ExcelExport
             groupBox6.Controls.Add(btnModifyPathConfig);
             groupBox6.Controls.Add(btnAddPathConfig);
             groupBox6.Controls.Add(textBoxConfigName);
-            groupBox6.Location = new System.Drawing.Point(6, 250);
+            groupBox6.Location = new System.Drawing.Point(7, 97);
             groupBox6.Margin = new System.Windows.Forms.Padding(4);
             groupBox6.Name = "groupBox6";
             groupBox6.Padding = new System.Windows.Forms.Padding(4);
-            groupBox6.Size = new System.Drawing.Size(775, 99);
+            groupBox6.Size = new System.Drawing.Size(774, 99);
             groupBox6.TabIndex = 4;
             groupBox6.TabStop = false;
             groupBox6.Text = "配置名称";
@@ -271,22 +272,22 @@ namespace ExcelExport
             textBoxConfigName.Size = new System.Drawing.Size(568, 23);
             textBoxConfigName.TabIndex = 0;
             // 
-            // groupBox5
+            // groupBox9
             // 
-            groupBox5.Controls.Add(btnSelectExport);
-            groupBox5.Controls.Add(textBoxExport);
-            groupBox5.Location = new System.Drawing.Point(7, 102);
-            groupBox5.Margin = new System.Windows.Forms.Padding(4);
-            groupBox5.Name = "groupBox5";
-            groupBox5.Padding = new System.Windows.Forms.Padding(4);
-            groupBox5.Size = new System.Drawing.Size(775, 66);
-            groupBox5.TabIndex = 3;
-            groupBox5.TabStop = false;
-            groupBox5.Text = "导出路径";
+            groupBox9.Controls.Add(btnSelectExport);
+            groupBox9.Controls.Add(textBoxExport);
+            groupBox9.Location = new System.Drawing.Point(7, 102);
+            groupBox9.Margin = new System.Windows.Forms.Padding(4);
+            groupBox9.Name = "groupBox9";
+            groupBox9.Padding = new System.Windows.Forms.Padding(4);
+            groupBox9.Size = new System.Drawing.Size(773, 66);
+            groupBox9.TabIndex = 3;
+            groupBox9.TabStop = false;
+            groupBox9.Text = "导出路径";
             // 
             // btnSelectExport
             // 
-            btnSelectExport.Location = new System.Drawing.Point(582, 22);
+            btnSelectExport.Location = new System.Drawing.Point(582, 23);
             btnSelectExport.Margin = new System.Windows.Forms.Padding(4);
             btnSelectExport.Name = "btnSelectExport";
             btnSelectExport.Size = new System.Drawing.Size(186, 29);
@@ -307,22 +308,22 @@ namespace ExcelExport
             textBoxExport.DragDrop += OnTextBoxExportDragDrop;
             textBoxExport.DragEnter += OnTextBoxExportDragEnter;
             // 
-            // groupBox4
+            // groupBox8
             // 
-            groupBox4.Controls.Add(btnSelectExcel);
-            groupBox4.Controls.Add(textBoxExcel);
-            groupBox4.Location = new System.Drawing.Point(7, 28);
-            groupBox4.Margin = new System.Windows.Forms.Padding(4);
-            groupBox4.Name = "groupBox4";
-            groupBox4.Padding = new System.Windows.Forms.Padding(4);
-            groupBox4.Size = new System.Drawing.Size(774, 66);
-            groupBox4.TabIndex = 2;
-            groupBox4.TabStop = false;
-            groupBox4.Text = "Excel路径";
+            groupBox8.Controls.Add(btnSelectExcel);
+            groupBox8.Controls.Add(textBoxExcel);
+            groupBox8.Location = new System.Drawing.Point(7, 28);
+            groupBox8.Margin = new System.Windows.Forms.Padding(4);
+            groupBox8.Name = "groupBox8";
+            groupBox8.Padding = new System.Windows.Forms.Padding(4);
+            groupBox8.Size = new System.Drawing.Size(773, 66);
+            groupBox8.TabIndex = 2;
+            groupBox8.TabStop = false;
+            groupBox8.Text = "Excel路径";
             // 
             // btnSelectExcel
             // 
-            btnSelectExcel.Location = new System.Drawing.Point(582, 22);
+            btnSelectExcel.Location = new System.Drawing.Point(582, 23);
             btnSelectExcel.Margin = new System.Windows.Forms.Padding(4);
             btnSelectExcel.Name = "btnSelectExcel";
             btnSelectExcel.Size = new System.Drawing.Size(186, 29);
@@ -343,18 +344,18 @@ namespace ExcelExport
             textBoxExcel.DragDrop += OnTextBoxExcelDragDrop;
             textBoxExcel.DragEnter += OnTextBoxExcelDragEnter;
             // 
-            // groupBox7
+            // groupBox3
             // 
-            groupBox7.BackColor = System.Drawing.Color.Transparent;
-            groupBox7.Controls.Add(configListComboBox);
-            groupBox7.Location = new System.Drawing.Point(7, 8);
-            groupBox7.Margin = new System.Windows.Forms.Padding(4);
-            groupBox7.Name = "groupBox7";
-            groupBox7.Padding = new System.Windows.Forms.Padding(4);
-            groupBox7.Size = new System.Drawing.Size(789, 79);
-            groupBox7.TabIndex = 4;
-            groupBox7.TabStop = false;
-            groupBox7.Text = "当前路径";
+            groupBox3.BackColor = System.Drawing.Color.Transparent;
+            groupBox3.Controls.Add(configListComboBox);
+            groupBox3.Location = new System.Drawing.Point(7, 8);
+            groupBox3.Margin = new System.Windows.Forms.Padding(4);
+            groupBox3.Name = "groupBox3";
+            groupBox3.Padding = new System.Windows.Forms.Padding(4);
+            groupBox3.Size = new System.Drawing.Size(789, 79);
+            groupBox3.TabIndex = 4;
+            groupBox3.TabStop = false;
+            groupBox3.Text = "当前配置";
             // 
             // configListComboBox
             // 
@@ -366,6 +367,17 @@ namespace ExcelExport
             configListComboBox.Size = new System.Drawing.Size(774, 25);
             configListComboBox.TabIndex = 7;
             configListComboBox.SelectedIndexChanged += OnConfigListComboBoxChanged;
+            // 
+            // groupBox4
+            // 
+            groupBox4.Controls.Add(groupBox5);
+            groupBox4.Controls.Add(groupBox6);
+            groupBox4.Location = new System.Drawing.Point(7, 94);
+            groupBox4.Name = "groupBox4";
+            groupBox4.Size = new System.Drawing.Size(789, 220);
+            groupBox4.TabIndex = 6;
+            groupBox4.TabStop = false;
+            groupBox4.Text = "基本配置";
             // 
             // ExcelExport
             // 
@@ -383,16 +395,17 @@ namespace ExcelExport
             tabPage1.ResumeLayout(false);
             groupBox1.ResumeLayout(false);
             tabPage2.ResumeLayout(false);
-            groupBox3.ResumeLayout(false);
-            groupBox8.ResumeLayout(false);
-            groupBox8.PerformLayout();
-            groupBox6.ResumeLayout(false);
-            groupBox6.PerformLayout();
+            groupBox7.ResumeLayout(false);
             groupBox5.ResumeLayout(false);
             groupBox5.PerformLayout();
+            groupBox6.ResumeLayout(false);
+            groupBox6.PerformLayout();
+            groupBox9.ResumeLayout(false);
+            groupBox9.PerformLayout();
+            groupBox8.ResumeLayout(false);
+            groupBox8.PerformLayout();
+            groupBox3.ResumeLayout(false);
             groupBox4.ResumeLayout(false);
-            groupBox4.PerformLayout();
-            groupBox7.ResumeLayout(false);
             ResumeLayout(false);
 
         }
@@ -408,12 +421,12 @@ namespace ExcelExport
         private System.Windows.Forms.CheckedListBox excelList;
         private System.Windows.Forms.TabPage tabPage2;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.GroupBox groupBox7;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.GroupBox groupBox5;
+        private System.Windows.Forms.GroupBox groupBox7;
+        private System.Windows.Forms.GroupBox groupBox9;
         private System.Windows.Forms.Button btnSelectExport;
         private System.Windows.Forms.TextBox textBoxExport;
-        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.GroupBox groupBox8;
         private System.Windows.Forms.Button btnSelectExcel;
         private System.Windows.Forms.TextBox textBoxExcel;
         private System.Windows.Forms.GroupBox groupBox6;
@@ -422,8 +435,9 @@ namespace ExcelExport
         private System.Windows.Forms.ComboBox configListComboBox;
         private System.Windows.Forms.Button btnModifyPathConfig;
         private System.Windows.Forms.Button btnDelectPathConfig;
-        private System.Windows.Forms.GroupBox groupBox8;
+        private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.TextBox textBoxAuthorName;
+        private System.Windows.Forms.GroupBox groupBox4;
     }
 }
 
