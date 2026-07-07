@@ -1,0 +1,119 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "F:\\Work\\Unity\\ExcelExport\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{EC727E99-3C9B-BD26-BB3C-4881F362E220}|ExcelExport\\ExcelExport.csproj|f:\\work\\unity\\excelexport\\excelexport\\helper\\confighelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EC727E99-3C9B-BD26-BB3C-4881F362E220}|ExcelExport\\ExcelExport.csproj|solutionrelative:excelexport\\helper\\confighelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC727E99-3C9B-BD26-BB3C-4881F362E220}|ExcelExport\\ExcelExport.csproj|f:\\work\\unity\\excelexport\\excelexport\\excelexportform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EC727E99-3C9B-BD26-BB3C-4881F362E220}|ExcelExport\\ExcelExport.csproj|solutionrelative:excelexport\\excelexportform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC727E99-3C9B-BD26-BB3C-4881F362E220}|ExcelExport\\ExcelExport.csproj|f:\\work\\unity\\excelexport\\excelexport\\excelexportform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EC727E99-3C9B-BD26-BB3C-4881F362E220}|ExcelExport\\ExcelExport.csproj|solutionrelative:excelexport\\excelexportform.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC727E99-3C9B-BD26-BB3C-4881F362E220}|ExcelExport\\ExcelExport.csproj|f:\\work\\unity\\excelexport\\excelexport\\excelexportform.resx||{81828910-B8B3-4D2B-99A3-067027C180C1}",
+      "RelativeMoniker": "D:0:0:{EC727E99-3C9B-BD26-BB3C-4881F362E220}|ExcelExport\\ExcelExport.csproj|solutionrelative:excelexport\\excelexportform.resx||{81828910-B8B3-4D2B-99A3-067027C180C1}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC727E99-3C9B-BD26-BB3C-4881F362E220}|ExcelExport\\ExcelExport.csproj|f:\\work\\unity\\excelexport\\excelexport\\memorystreamex.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{EC727E99-3C9B-BD26-BB3C-4881F362E220}|ExcelExport\\ExcelExport.csproj|solutionrelative:excelexport\\memorystreamex.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{EC727E99-3C9B-BD26-BB3C-4881F362E220}|ExcelExport\\ExcelExport.csproj|F:\\Work\\Unity\\ExcelExport\\excelexport\\excelexportform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{EC727E99-3C9B-BD26-BB3C-4881F362E220}|ExcelExport\\ExcelExport.csproj|solutionrelative:excelexport\\excelexportform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "ConfigHelper.cs",
+              "DocumentMoniker": "F:\\Work\\Unity\\ExcelExport\\ExcelExport\\Helper\\ConfigHelper.cs",
+              "RelativeDocumentMoniker": "ExcelExport\\Helper\\ConfigHelper.cs",
+              "ToolTip": "F:\\Work\\Unity\\ExcelExport\\ExcelExport\\Helper\\ConfigHelper.cs",
+              "RelativeToolTip": "ExcelExport\\Helper\\ConfigHelper.cs",
+              "ViewState": "AgIAAHsAAAAAAAAAAAAgwJ8AAAAQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-07T04:50:33.634Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ExcelExportForm.cs",
+              "DocumentMoniker": "F:\\Work\\Unity\\ExcelExport\\ExcelExport\\ExcelExportForm.cs",
+              "RelativeDocumentMoniker": "ExcelExport\\ExcelExportForm.cs",
+              "ToolTip": "F:\\Work\\Unity\\ExcelExport\\ExcelExport\\ExcelExportForm.cs",
+              "RelativeToolTip": "ExcelExport\\ExcelExportForm.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-07T04:48:50.851Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "ExcelExportForm.Designer.cs",
+              "DocumentMoniker": "F:\\Work\\Unity\\ExcelExport\\ExcelExport\\ExcelExportForm.Designer.cs",
+              "RelativeDocumentMoniker": "ExcelExport\\ExcelExportForm.Designer.cs",
+              "ToolTip": "F:\\Work\\Unity\\ExcelExport\\ExcelExport\\ExcelExportForm.Designer.cs",
+              "RelativeToolTip": "ExcelExport\\ExcelExportForm.Designer.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-07T04:48:37.424Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "ExcelExportForm.resx",
+              "DocumentMoniker": "F:\\Work\\Unity\\ExcelExport\\ExcelExport\\ExcelExportForm.resx",
+              "RelativeDocumentMoniker": "ExcelExport\\ExcelExportForm.resx",
+              "ToolTip": "F:\\Work\\Unity\\ExcelExport\\ExcelExport\\ExcelExportForm.resx",
+              "RelativeToolTip": "ExcelExport\\ExcelExportForm.resx",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001005|",
+              "WhenOpened": "2026-07-07T04:48:36.791Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "MemoryStreamEx.cs",
+              "DocumentMoniker": "F:\\Work\\Unity\\ExcelExport\\ExcelExport\\MemoryStreamEx.cs",
+              "RelativeDocumentMoniker": "ExcelExport\\MemoryStreamEx.cs",
+              "ToolTip": "F:\\Work\\Unity\\ExcelExport\\ExcelExport\\MemoryStreamEx.cs",
+              "RelativeToolTip": "ExcelExport\\MemoryStreamEx.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-07T04:48:31.016Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "ExcelExportForm.cs [\u8BBE\u8BA1]",
+              "DocumentMoniker": "F:\\Work\\Unity\\ExcelExport\\ExcelExport\\ExcelExportForm.cs",
+              "RelativeDocumentMoniker": "ExcelExport\\ExcelExportForm.cs",
+              "ToolTip": "C:\\Users\\WuWu\\Desktop\\ExcelExport\\ExcelExport\\ExcelExportForm.cs [\u8BBE\u8BA1]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-07-07T04:48:20.293Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

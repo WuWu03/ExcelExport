@@ -1,9 +1,7 @@
 ﻿using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
-using System.Collections.Generic;
 using System.Data;
-using System.IO;
 
 namespace ExcelExport.Helper
 {
@@ -53,7 +51,7 @@ namespace ExcelExport.Helper
                     continue;
                 }
 
-                List<int> columns = new();
+                List<int> columns = [];
 
                 for (int j = 0; j < header.LastCellNum; j++)
                 {
@@ -109,34 +107,39 @@ namespace ExcelExport.Helper
         {
             if (cell == null)
             {
-                return null;
+                return string.Empty;
             }
 
             return cell.CellType switch
             {
-                CellType.Blank => string.Empty,
-                CellType.Boolean => cell.BooleanCellValue,
+                CellType._None => string.Empty,
                 CellType.Numeric => cell.NumericCellValue,
                 CellType.String => cell.StringCellValue,
-                CellType.Error => cell.ErrorCellValue,
                 CellType.Formula => GetCachedFormulaResult(cell),
-                CellType.Unknown => string.Empty,
+                CellType.Blank => string.Empty,
+                CellType.Boolean => cell.BooleanCellValue,
+                CellType.Error => cell.ErrorCellValue,
                 _ => string.Empty,
             };
         }
 
         private static object GetCachedFormulaResult(ICell cell)
         {
+            if (cell == null)
+            {
+                return string.Empty;
+            }
+
             return cell.CachedFormulaResultType switch
             {
-                CellType.Unknown => null,
                 CellType.Numeric => cell.NumericCellValue,
                 CellType.String => cell.StringCellValue,
-                CellType.Blank => null,
+                CellType.Blank => string.Empty,
                 CellType.Boolean => cell.BooleanCellValue,
-                CellType.Formula => null,
-                CellType.Error => null,
-                _ => null,
+                CellType.Formula => string.Empty,
+                CellType.Error => string.Empty,
+                CellType._None => string.Empty,
+                _ => string.Empty,
             };
         }
     }
