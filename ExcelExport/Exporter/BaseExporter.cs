@@ -1,10 +1,6 @@
 ﻿using ExcelExport.Helper;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Text;
-using System.Windows.Forms;
 
 namespace ExcelExport.Exporter
 {
@@ -30,7 +26,7 @@ namespace ExcelExport.Exporter
 
         public void AddExcel(string excelPath)
         {
-            excels ??= new List<string>();
+            excels ??= [];
             excels.Add(excelPath);
         }
 
@@ -47,10 +43,8 @@ namespace ExcelExport.Exporter
             }
 
             CreateExportPath();
-
-            dataTableNames ??= new List<string>();
-            m_LanguageDataTables ??= new List<DataTable>();
-
+            dataTableNames ??= [];
+            m_LanguageDataTables ??= [];
             dataTableNames.Clear();
             m_LanguageDataTables.Clear();
 
@@ -136,8 +130,8 @@ namespace ExcelExport.Exporter
 
             StringBuilder allKeysSB = new();
             StringBuilder allContentSB = new();
-
             bool hasAddAllKeys = false;
+
             for (int i = 0; i < m_LanguageDataTables.Count; i++)
             {
                 DataTable dt = m_LanguageDataTables[i];
@@ -178,9 +172,6 @@ namespace ExcelExport.Exporter
             }
         }
 
-        //protected abstract void ExportLanguageFile(string path, string content);
-        //protected abstract string GetLanguageDataExprotPath(string fileName = "");
-        //protected abstract string GetLanguageDataName(string fileName, string ext);
         protected abstract void CreateExportPath();
         protected abstract void ExportData(DataTable dt, string excelName, string sheetName);
         protected abstract void ExportLanguageData(DataTable dt, string excelName, string sheetName);

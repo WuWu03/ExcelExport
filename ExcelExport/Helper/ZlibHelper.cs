@@ -1,6 +1,4 @@
 ﻿using ComponentAce.Compression.Libs.zlib;
-using System;
-using System.IO;
 
 namespace ExcelExport.Helper
 {
@@ -18,7 +16,10 @@ namespace ExcelExport.Helper
         /// <returns>压缩后的字节数组，如果出错则返回null</returns>
         public static byte[] CompressBytes(byte[] OrgByte, int CompressRate = zlibConst.Z_BEST_SPEED)
         {
-            if (OrgByte == null) return null;
+            if (OrgByte == null)
+            {
+                return null;
+            }
 
             using MemoryStream OrgStream = new(OrgByte);
             using MemoryStream CompressedStream = new();
@@ -29,7 +30,10 @@ namespace ExcelExport.Helper
                 CopyStream(OrgStream, outZStream);
                 outZStream.finish();//重要！否则结果数据不完整！
                                     //程序执行到这里，CompressedStream就是压缩后的数据
-                if (CompressedStream == null) return null;
+                if (CompressedStream == null)
+                {
+                    return null;
+                }
 
                 return CompressedStream.ToArray();
             }
@@ -48,7 +52,10 @@ namespace ExcelExport.Helper
         /// <returns>解压缩后的字节数组，如果出错则返回null</returns>
         public static byte[] DeCompressBytes(byte[] CompressedBytes)
         {
-            if (CompressedBytes == null) return null;
+            if (CompressedBytes == null)
+            {
+                return null;
+            }
 
             using MemoryStream CompressedStream = new(CompressedBytes);
             using MemoryStream OrgStream = new();
@@ -67,6 +74,7 @@ namespace ExcelExport.Helper
                 {
                     return null;
                 }
+
                 return OrgStream.ToArray();
             }
             catch
@@ -86,6 +94,7 @@ namespace ExcelExport.Helper
         {
             byte[] byteSource = System.Text.Encoding.UTF8.GetBytes(SourceString);
             byte[] byteCompress = CompressBytes(byteSource, CompressRate);
+
             if (byteCompress != null)
             {
                 return Convert.ToBase64String(byteCompress);
@@ -107,6 +116,7 @@ namespace ExcelExport.Helper
         {
             byte[] byteSource = Convert.FromBase64String(SourceString);
             byte[] byteDecompress = DeCompressBytes(byteSource);
+
             if (byteDecompress != null)
             {
 
@@ -129,10 +139,12 @@ namespace ExcelExport.Helper
         {
             byte[] buffer = new byte[2000];
             int len;
+
             while ((len = input.Read(buffer, 0, 2000)) > 0)
             {
                 output.Write(buffer, 0, len);
             }
+
             output.Flush();
         }
         #endregion
@@ -143,9 +155,9 @@ namespace ExcelExport.Helper
         /// </summary>
         /// <param name="zipData"></param>
         /// <returns></returns>
-        public static string GetStringByGZIPData(byte[] zipData)
+        public static string GetStringByZIPData(byte[] zipData)
         {
-            return (string)(System.Text.Encoding.UTF8.GetString(zipData));
+            return System.Text.Encoding.UTF8.GetString(zipData);
         }
         #endregion
     }

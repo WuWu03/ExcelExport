@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Xml;
+﻿using System.Xml;
 
 namespace ExcelExport.Helper
 {
     public static class ConfigHelper
     {
+        private static readonly List<string[]> s_ConfigDatas = [];
+        private static int s_CurrSelectIndex = -1;
+
         public static int currSelectIndex
         {
             get
@@ -34,12 +35,13 @@ namespace ExcelExport.Helper
             {
                 for (int i = 0; i < xmlNode.ChildNodes[1].ChildNodes[0].ChildNodes.Count; i++)
                 {
-                    string[] config = new string[4];
-                    config[0] = xmlNode.ChildNodes[1].ChildNodes[0].ChildNodes[i].ChildNodes[0].InnerText;
-                    config[1] = xmlNode.ChildNodes[1].ChildNodes[0].ChildNodes[i].ChildNodes[1].InnerText;
-                    config[2] = xmlNode.ChildNodes[1].ChildNodes[0].ChildNodes[i].ChildNodes[2].InnerText;
-                    config[3] = xmlNode.ChildNodes[1].ChildNodes[0].ChildNodes[i].ChildNodes[3].InnerText;
-
+                    string[] config =
+                    [
+                        xmlNode.ChildNodes[1].ChildNodes[0].ChildNodes[i].ChildNodes[0].InnerText,
+                        xmlNode.ChildNodes[1].ChildNodes[0].ChildNodes[i].ChildNodes[1].InnerText,
+                        xmlNode.ChildNodes[1].ChildNodes[0].ChildNodes[i].ChildNodes[2].InnerText,
+                        xmlNode.ChildNodes[1].ChildNodes[0].ChildNodes[i].ChildNodes[3].InnerText,
+                    ];
                     s_ConfigDatas.Add(config);
                 }
             }
@@ -71,28 +73,23 @@ namespace ExcelExport.Helper
 
         public static void AddPathConfig(string excelPath, string exportPath, string authorName, string configName)
         {
-            s_ConfigDatas.Add(new string[4] { excelPath, exportPath, authorName, configName });
+            s_ConfigDatas.Add([excelPath, exportPath, authorName, configName]);
             s_CurrSelectIndex = s_ConfigDatas.Count - 1;
-
             XmlDocument doc = GetXmlDocument();
-
             XmlNode pathNode = doc.CreateNode(XmlNodeType.Element, "Path", null);
             XmlNode excelPathNode = doc.CreateNode(XmlNodeType.Element, "ExcelPath", null);
             XmlNode exportPathNode = doc.CreateNode(XmlNodeType.Element, "ExportPath", null);
             XmlNode autherNameNode = doc.CreateNode(XmlNodeType.Element, "AuthorName", null);
             XmlNode configNameNode = doc.CreateNode(XmlNodeType.Element, "ConfigName", null);
-
             excelPathNode.InnerText = excelPath;
             exportPathNode.InnerText = exportPath;
             autherNameNode.InnerText = authorName;
             configNameNode.InnerText = configName;
-
             pathNode.AppendChild(excelPathNode);
             pathNode.AppendChild(exportPathNode);
             pathNode.AppendChild(autherNameNode);
             pathNode.AppendChild(configNameNode);
             doc.ChildNodes[1].ChildNodes[0].AppendChild(pathNode);
-
             SetXmlNode(doc);
         }
 
@@ -101,7 +98,6 @@ namespace ExcelExport.Helper
             XmlDocument doc = GetXmlDocument();
             XmlNode currNode = doc.ChildNodes[1].ChildNodes[0].ChildNodes[s_CurrSelectIndex];
             doc.ChildNodes[1].ChildNodes[0].RemoveChild(currNode);
-
             s_ConfigDatas.RemoveAt(s_CurrSelectIndex);
             s_CurrSelectIndex--;
 
@@ -119,11 +115,8 @@ namespace ExcelExport.Helper
             s_ConfigDatas[s_CurrSelectIndex][1] = exportPath;
             s_ConfigDatas[s_CurrSelectIndex][2] = authorName;
             s_ConfigDatas[s_CurrSelectIndex][3] = configName;
-
             XmlDocument doc = GetXmlDocument();
-
             XmlNode currNode = doc.ChildNodes[1].ChildNodes[0].ChildNodes[s_CurrSelectIndex];
-
             currNode.ChildNodes[0].InnerText = excelPath;
             currNode.ChildNodes[1].InnerText = exportPath;
             currNode.ChildNodes[2].InnerText = authorName;
@@ -170,8 +163,5 @@ namespace ExcelExport.Helper
 
             return doc;
         }
-
-        private static readonly List<string[]> s_ConfigDatas = new();
-        private static int s_CurrSelectIndex = -1;
     }
 }

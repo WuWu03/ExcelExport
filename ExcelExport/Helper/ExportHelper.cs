@@ -1,14 +1,11 @@
 ﻿using ExcelExport.Exporter;
-using System.Collections.Generic;
-using System.IO;
 
 namespace ExcelExport.Helper
 {
     public static class ExportHelper
     {
-
         private static int s_CurrExporterIndex = 0;
-        private readonly static List<BaseExporter> s_Exporters = new();
+        private readonly static List<BaseExporter> s_Exporters = [];
         private static List<bool> s_CanExportExcels = null;
 
         public const string ExportRoot = "DataExport";
@@ -36,7 +33,7 @@ namespace ExcelExport.Helper
 
         public static void AddExcel(string excelPath)
         {
-            s_CanExportExcels ??= new List<bool>();
+            s_CanExportExcels ??= [];
             s_CanExportExcels.Add(true);
 
             for (int i = 0; i < s_Exporters.Count; i++)

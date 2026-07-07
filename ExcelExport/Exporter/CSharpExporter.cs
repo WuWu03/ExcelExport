@@ -1,11 +1,7 @@
 ﻿using ExcelExport.Helper;
 using ExcelExport.LitJson;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Text;
-using System.Windows.Forms;
 
 namespace ExcelExport.Exporter
 {
@@ -41,14 +37,14 @@ namespace ExcelExport.Exporter
         class JsonStruct
         {
             public string className;
-            public Dictionary<string, string> fields = new();
+            public Dictionary<string, string> fields = [];
             public List<JsonStruct> children;
         }
 
         public override string exporterName => "C#";
 
-        private readonly List<string> m_NameSpaces = new()
-        {
+        private readonly List<string> m_NameSpaces =
+        [
             "using LitJson;\r\n",
             "using System;\r\n",
             "using System.Collections;\r\n",
@@ -56,7 +52,7 @@ namespace ExcelExport.Exporter
             "using UnityEngine;\r\n",
             "using WuWuFramework;\r\n",
             "using WuWuFramework.ConfigData;\r\n",
-        };
+        ];
 
         protected override void CreateExportPath()
         {
@@ -146,7 +142,7 @@ namespace ExcelExport.Exporter
             sb.Append("{\r\n");
 
             //生成Json实体类代码
-            Dictionary<string, string> jsonDic = new();
+            Dictionary<string, string> jsonDic = [];
 
             for (int i = 1; i < dataArr.GetLength(0); i++)
             {
@@ -668,7 +664,7 @@ namespace ExcelExport.Exporter
                     if (string.IsNullOrEmpty(fieldType))
                     {
                         fieldType = string.Concat(key[..1].ToUpper(), key.AsSpan(1));
-                        jsonStruct.children ??= new List<JsonStruct>();
+                        jsonStruct.children ??= [];
                         JsonStruct childJsonStruct = null;
 
                         for (int i = 0; i < jsonStruct.children.Count; i++)
@@ -800,33 +796,33 @@ namespace ExcelExport.Exporter
                     throw new Exception("字典类型配置错误！");
                 }
 
-                return new string[] { "Dictionary", dicTypes[0], dicTypes[1] };
+                return ["Dictionary", dicTypes[0], dicTypes[1]];
             }
 
             return typeName switch
             {
-                "byte" => new string[] { "byte" },
-                "short" => new string[] { "short" },
-                "int" => new string[] { "int" },
-                "long" => new string[] { "long" },
-                "float" => new string[] { "float" },
-                "double" => new string[] { "double" },
-                "bool" => new string[] { "bool" },
-                "string" => new string[] { "string" },
-                "vector2" => new string[] { "Vector2" },
-                "vector3" => new string[] { "Vector3" },
-                "byte[]" => new string[] { "byte[]" },
-                "short[]" => new string[] { "short[]" },
-                "int[]" => new string[] { "int[]" },
-                "long[]" => new string[] { "long[]" },
-                "float[]" => new string[] { "float[]" },
-                "double[]" => new string[] { "double[]" },
-                "bool[]" => new string[] { "bool[]" },
-                "string[]" => new string[] { "string[]" },
-                "vector2[]" => new string[] { "Vector2[]" },
-                "vector3[]" => new string[] { "Vector3[]" },
-                "json" => new string[] { "json" },
-                "json[]" => new string[] { "json[]" },
+                "byte" => ["byte"],
+                "short" => ["short"],
+                "int" => ["int"],
+                "long" => ["long"],
+                "float" => ["float"],
+                "double" => ["double"],
+                "bool" => ["bool"],
+                "string" => ["string"],
+                "vector2" => ["Vector2"],
+                "vector3" => ["Vector3"],
+                "byte[]" => ["byte[]"],
+                "short[]" => ["short[]"],
+                "int[]" => ["int[]"],
+                "long[]" => ["long[]"],
+                "float[]" => ["float[]"],
+                "double[]" => ["double[]"],
+                "bool[]" => ["bool[]"],
+                "string[]" => ["string[]"],
+                "vector2[]" => ["Vector2[]"],
+                "vector3[]" => ["Vector3[]"],
+                "json" => ["json"],
+                "json[]" => ["json[]"],
                 _ => throw new NotImplementedException(),
             };
         }
