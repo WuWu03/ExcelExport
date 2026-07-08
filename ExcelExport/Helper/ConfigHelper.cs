@@ -5,9 +5,9 @@ namespace ExcelExport.Helper
     public static class ConfigHelper
     {
         private static readonly List<string[]> s_ConfigDatas = [];
+        private static readonly HashSet<string> s_ExistNames = [];
         private static int s_CurrSelectIndex = -1;
         private const string PATH_CONFIG_NAME = "PathConfig.xml";
-        private static readonly HashSet<string> s_ExistNames = [];
 
         public static int currSelectIndex
         {
