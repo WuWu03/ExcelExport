@@ -155,10 +155,16 @@ namespace ExcelExport
             string exportPath = textBoxExport.Text;
             string authorName = textBoxAuthorName.Text;
             string configName = textBoxConfigName.Text;
+
+            if(!ConfigHelper.AddPathConfig(excelPath, exportPath, authorName, configName))
+            {
+                MessageBox.Show(this, "配置名重复", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
             configListComboBox.Items[^1] = configName;
             configListComboBox.Items.Add("添加配置");
             ConfigHelper.currSelectIndex = configListComboBox.Items.Count - 2;
-            ConfigHelper.AddPathConfig(excelPath, exportPath, authorName, configName);
             configListComboBox.SelectedIndex = ConfigHelper.currSelectIndex;
             OnConfigListComboBoxChanged(configListComboBox, null);
             MessageBox.Show(this, "添加成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);

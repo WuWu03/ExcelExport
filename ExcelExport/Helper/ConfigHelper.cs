@@ -7,6 +7,7 @@ namespace ExcelExport.Helper
         private static readonly List<string[]> s_ConfigDatas = [];
         private static int s_CurrSelectIndex = -1;
         private const string PATH_CONFIG_NAME = "PathConfig.xml";
+        private static readonly HashSet<string> s_ExistNames = [];
 
         public static int currSelectIndex
         {
@@ -46,6 +47,7 @@ namespace ExcelExport.Helper
                     string exportPath = string.IsNullOrEmpty(pathConfig.ChildNodes[1].InnerText) ? string.Empty : pathConfig.ChildNodes[1].InnerText;
                     string authorName = string.IsNullOrEmpty(pathConfig.ChildNodes[2].InnerText) ? string.Empty : pathConfig.ChildNodes[2].InnerText;
                     string configName = string.IsNullOrEmpty(pathConfig.ChildNodes[3].InnerText) ? string.Empty : pathConfig.ChildNodes[3].InnerText;
+                    s_ExistNames.Add(configName);
                     s_ConfigDatas.Add([excelPath, exportPath, authorName, configName]);
                 }
 
@@ -68,10 +70,16 @@ namespace ExcelExport.Helper
             return s_ConfigDatas[s_CurrSelectIndex]; ;
         }
 
-        public static void AddPathConfig(string excelPath, string exportPath, string authorName, string configName)
+        public static bool AddPathConfig(string excelPath, string exportPath, string authorName, string configName)
         {
+            if (!s_ExistNames.Add(configName))
+            {
+                return false;
+            }
+
             s_ConfigDatas.Add([excelPath, exportPath, authorName, configName]);
             s_CurrSelectIndex = s_ConfigDatas.Count - 1;
+            return true;
         }
 
         public static void DeletePathConfig()
