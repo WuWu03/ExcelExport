@@ -15,7 +15,7 @@ namespace ExcelExport
             ExportHelper.AddExporter(new CSharpExporter());
             // ExportHelper.AddExporter(new LuaExporter()));
 
-            for(int i = 0; i < ExportHelper.exporters.Count; i++)
+            for (int i = 0; i < ExportHelper.exporters.Count; i++)
             {
                 codeTypeComboBox.Items.Add(ExportHelper.exporters[i].exporterName);
             }
@@ -133,7 +133,7 @@ namespace ExcelExport
         /// <param name="e"></param>
         private void OnBtnModifyPathConfigClick(object sender, EventArgs e)
         {
-            ConfigHelper.ModifyPahtConfig(textBoxExcel.Text, textBoxExport.Text, textBoxAuthorName.Text, textBoxConfigName.Text);
+            ConfigHelper.ModifyPathConfig(textBoxExcel.Text, textBoxExport.Text, textBoxAuthorName.Text, textBoxConfigName.Text);
             configListComboBox.Items[configListComboBox.SelectedIndex] = ConfigHelper.GetCurrConfig()[3];
             MessageBox.Show(this, "修改成功", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
@@ -292,7 +292,7 @@ namespace ExcelExport
         /// <param name="e"></param>
         private void OnTextBoxExcelDragDrop(object sender, DragEventArgs e)
         {
-            if(e == null || e.Data == null)
+            if (e == null || e.Data == null)
             {
                 return;
             }
@@ -344,7 +344,7 @@ namespace ExcelExport
 
             object data = e.Data.GetData(DataFormats.FileDrop);
 
-            if (data is Array array) 
+            if (data is Array array)
             {
                 object value = array.GetValue(0);
                 textBoxExport.Text = value != null ? value.ToString() : string.Empty; ;
@@ -381,7 +381,10 @@ namespace ExcelExport
             }
         }
 
-
+        private void OnFormClosing(object sender, FormClosingEventArgs e)
+        {
+            ConfigHelper.SaveConfig();
+        }
 
         //异或因子
         //private byte[] xorScale = new byte[] { 45, 66, 38, 55, 23, 254, 9, 165, 90, 19, 41, 45, 201, 58, 55, 37, 254, 185, 165, 169, 19, 171 };//.data文件的xor加解密因子

@@ -6,6 +6,7 @@ namespace ExcelExport.Helper
     {
         private static readonly List<string[]> s_ConfigDatas = [];
         private static int s_CurrSelectIndex = -1;
+        private const string PATH_CONFIG_NAME = "PathConfig.xml";
 
         public static int currSelectIndex
         {
@@ -29,30 +30,26 @@ namespace ExcelExport.Helper
 
         public static void InitConfig()
         {
-            XmlDocument xmlNode = GetXmlDocument();
+            s_CurrSelectIndex = 0;
+            XmlDocument doc = LoadConfig();
 
-            if (xmlNode.ChildNodes[1].ChildNodes.Count > 0)
+            if (doc != null)
             {
-                for (int i = 0; i < xmlNode.ChildNodes[1].ChildNodes[0].ChildNodes.Count; i++)
+                XmlNode configRoot = doc.ChildNodes[1];
+                XmlNode pathConfigs = configRoot.ChildNodes[0];
+                XmlNode indexConfig = configRoot.ChildNodes[1];
+
+                for (int i = 0; i < pathConfigs.ChildNodes.Count; i++)
                 {
-                    string[] config =
-                    [
-                        xmlNode.ChildNodes[1].ChildNodes[0].ChildNodes[i].ChildNodes[0].InnerText,
-                        xmlNode.ChildNodes[1].ChildNodes[0].ChildNodes[i].ChildNodes[1].InnerText,
-                        xmlNode.ChildNodes[1].ChildNodes[0].ChildNodes[i].ChildNodes[2].InnerText,
-                        xmlNode.ChildNodes[1].ChildNodes[0].ChildNodes[i].ChildNodes[3].InnerText,
-                    ];
-                    s_ConfigDatas.Add(config);
+                    XmlNode pathConfig = pathConfigs.ChildNodes[i];
+                    string excelPath = string.IsNullOrEmpty(pathConfig.ChildNodes[0].InnerText) ? string.Empty : pathConfig.ChildNodes[0].InnerText;
+                    string exportPath = string.IsNullOrEmpty(pathConfig.ChildNodes[1].InnerText) ? string.Empty : pathConfig.ChildNodes[1].InnerText;
+                    string authorName = string.IsNullOrEmpty(pathConfig.ChildNodes[2].InnerText) ? string.Empty : pathConfig.ChildNodes[2].InnerText;
+                    string configName = string.IsNullOrEmpty(pathConfig.ChildNodes[3].InnerText) ? string.Empty : pathConfig.ChildNodes[3].InnerText;
+                    s_ConfigDatas.Add([excelPath, exportPath, authorName, configName]);
                 }
-            }
 
-            if (xmlNode.ChildNodes[1].ChildNodes.Count >= 2)
-            {
-                s_CurrSelectIndex = int.Parse(xmlNode.ChildNodes[1].ChildNodes[1].InnerText);
-            }
-            else
-            {
-                s_CurrSelectIndex = 0;
+                s_CurrSelectIndex = string.IsNullOrEmpty(indexConfig.InnerText) ? 0 : int.Parse(indexConfig.InnerText);
             }
         }
 
@@ -75,29 +72,10 @@ namespace ExcelExport.Helper
         {
             s_ConfigDatas.Add([excelPath, exportPath, authorName, configName]);
             s_CurrSelectIndex = s_ConfigDatas.Count - 1;
-            XmlDocument doc = GetXmlDocument();
-            XmlNode pathNode = doc.CreateNode(XmlNodeType.Element, "Path", null);
-            XmlNode excelPathNode = doc.CreateNode(XmlNodeType.Element, "ExcelPath", null);
-            XmlNode exportPathNode = doc.CreateNode(XmlNodeType.Element, "ExportPath", null);
-            XmlNode autherNameNode = doc.CreateNode(XmlNodeType.Element, "AuthorName", null);
-            XmlNode configNameNode = doc.CreateNode(XmlNodeType.Element, "ConfigName", null);
-            excelPathNode.InnerText = excelPath;
-            exportPathNode.InnerText = exportPath;
-            autherNameNode.InnerText = authorName;
-            configNameNode.InnerText = configName;
-            pathNode.AppendChild(excelPathNode);
-            pathNode.AppendChild(exportPathNode);
-            pathNode.AppendChild(autherNameNode);
-            pathNode.AppendChild(configNameNode);
-            doc.ChildNodes[1].ChildNodes[0].AppendChild(pathNode);
-            SetXmlNode(doc);
         }
 
         public static void DeletePathConfig()
         {
-            XmlDocument doc = GetXmlDocument();
-            XmlNode currNode = doc.ChildNodes[1].ChildNodes[0].ChildNodes[s_CurrSelectIndex];
-            doc.ChildNodes[1].ChildNodes[0].RemoveChild(currNode);
             s_ConfigDatas.RemoveAt(s_CurrSelectIndex);
             s_CurrSelectIndex--;
 
@@ -105,62 +83,68 @@ namespace ExcelExport.Helper
             {
                 s_CurrSelectIndex = 0;
             }
-
-            SetXmlNode(doc);
         }
 
-        public static void ModifyPahtConfig(string excelPath, string exportPath, string authorName, string configName)
+        public static void ModifyPathConfig(string excelPath, string exportPath, string authorName, string configName)
         {
             s_ConfigDatas[s_CurrSelectIndex][0] = excelPath;
             s_ConfigDatas[s_CurrSelectIndex][1] = exportPath;
             s_ConfigDatas[s_CurrSelectIndex][2] = authorName;
             s_ConfigDatas[s_CurrSelectIndex][3] = configName;
-            XmlDocument doc = GetXmlDocument();
-            XmlNode currNode = doc.ChildNodes[1].ChildNodes[0].ChildNodes[s_CurrSelectIndex];
-            currNode.ChildNodes[0].InnerText = excelPath;
-            currNode.ChildNodes[1].InnerText = exportPath;
-            currNode.ChildNodes[2].InnerText = authorName;
-            currNode.ChildNodes[3].InnerText = configName;
-            SetXmlNode(doc);
         }
 
-        private static void SetXmlNode(XmlDocument doc)
+        public static void SaveConfig()
         {
-            XmlNode indexNode;
+            XmlDocument doc = CreateConfig();
+            XmlNode configRoot = doc.ChildNodes[1];
+            XmlNode pathConfigs = configRoot.ChildNodes[0];
+            XmlNode indexConfig = configRoot.ChildNodes[1];
 
-            if (doc.ChildNodes[1].ChildNodes.Count < 2)
+            foreach (string[] configData in s_ConfigDatas)
             {
-                indexNode = doc.CreateNode(XmlNodeType.Element, "CurrIndex", null);
-                doc.ChildNodes[1].AppendChild(indexNode);
-            }
-            else
-            {
-                indexNode = doc.ChildNodes[1].ChildNodes[1];
+                XmlNode config = doc.CreateNode(XmlNodeType.Element, "Config", null);
+                XmlNode excelPathNode = doc.CreateNode(XmlNodeType.Element, "ExcelPath", null);
+                XmlNode exportPathNode = doc.CreateNode(XmlNodeType.Element, "ExportPath", null);
+                XmlNode autherNameNode = doc.CreateNode(XmlNodeType.Element, "AuthorName", null);
+                XmlNode configNameNode = doc.CreateNode(XmlNodeType.Element, "ConfigName", null);
+                excelPathNode.InnerText = string.IsNullOrEmpty(configData[0]) ? string.Empty : configData[0];
+                exportPathNode.InnerText = string.IsNullOrEmpty(configData[1]) ? string.Empty : configData[1];
+                autherNameNode.InnerText = string.IsNullOrEmpty(configData[2]) ? string.Empty : configData[2];
+                configNameNode.InnerText = string.IsNullOrEmpty(configData[3]) ? string.Empty : configData[3];
+                config.AppendChild(excelPathNode);
+                config.AppendChild(exportPathNode);
+                config.AppendChild(autherNameNode);
+                config.AppendChild(configNameNode);
+                pathConfigs.AppendChild(config);
             }
 
-            indexNode.InnerText = s_CurrSelectIndex.ToString();
-            doc.Save("PathConfig.xml");
+            indexConfig.InnerText = s_CurrSelectIndex.ToString();
+            doc.Save(PATH_CONFIG_NAME);
         }
 
-        private static XmlDocument GetXmlDocument()
+        private static XmlDocument LoadConfig()
+        {
+            if (File.Exists(PATH_CONFIG_NAME))
+            {
+                XmlDocument doc = new();
+                doc.Load(PATH_CONFIG_NAME);
+                return doc;
+            }
+
+            return null;
+        }
+
+        private static XmlDocument CreateConfig()
         {
             XmlDocument doc = new();
-
-            if (File.Exists("PathConfig.xml"))
-            {
-                doc.Load("PathConfig.xml");
-            }
-            else
-            {
-                XmlDeclaration dec = doc.CreateXmlDeclaration("1.0", "utf-8", null);
-                doc.AppendChild(dec);
-
-                XmlNode pathConfig = doc.CreateNode(XmlNodeType.Element, "PathConfig", null);
-                XmlNode pathList = doc.CreateNode(XmlNodeType.Element, "PathList", null);
-                pathConfig.AppendChild(pathList);
-                doc.AppendChild(pathConfig);
-            }
-
+            XmlDeclaration dec = doc.CreateXmlDeclaration("1.0", "utf-8", null);
+            doc.AppendChild(dec);
+            XmlNode configRoot = doc.CreateNode(XmlNodeType.Element, "ConfigRoot", null);
+            XmlNode pathConfig = doc.CreateNode(XmlNodeType.Element, "PathConfigs", null);
+            XmlNode indexConfig = doc.CreateNode(XmlNodeType.Element, "IndexConfig", null);
+            configRoot.AppendChild(pathConfig);
+            configRoot.AppendChild(indexConfig);
+            doc.AppendChild(configRoot);
             return doc;
         }
     }
